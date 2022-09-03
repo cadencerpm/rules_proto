@@ -1,0 +1,2 @@
+proto,proto,validate/validate.proto,@envoyproxy_protoc_gen_validate//validate:validate.proto
+protobuf,proto_go_library,validate/validate.proto,@envoyproxy_protoc_gen_validate//validate:validate.proto

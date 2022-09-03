@@ -1,4 +1,6 @@
 __pycache__
+.idea
 docs/vendor
 node_modules
 vendor/**/BUILD.bazel
+bazel-*
