@@ -156,6 +156,14 @@ load("//deps:grpc_gateway_openapiv2_deps.bzl", "grpc_gateway_openapiv2_deps")
 grpc_gateway_openapiv2_deps()
 
 # ----------------------------------------------------
+# protoc-gen-validate
+# ----------------------------------------------------
+
+load("//deps:protoc_gen_validate_deps.bzl", "protoc_gen_validate_deps")
+
+protoc_gen_validate_deps()
+
+# ----------------------------------------------------
 # Scala
 # ----------------------------------------------------
 

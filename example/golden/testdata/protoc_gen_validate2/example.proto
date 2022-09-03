@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+enum Enum{
+  UNKNOWN = 0;
+}
+
+message Message{
+    uint64 id    = 1 [(validate.rules).uint64.gt    = 999];
+}
+
+service Service {
+  rpc Test (Message) returns (Message) {
+    option (google.api.http) = {
+      post: "/test"
+      body: "*"
+    };
+  }
+
+}

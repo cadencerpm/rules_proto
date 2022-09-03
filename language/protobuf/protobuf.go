@@ -6,6 +6,7 @@ import (
 	"github.com/stackb/rules_proto/pkg/language/protobuf"
 
 	_ "github.com/stackb/rules_proto/pkg/plugin/builtin"
+	_ "github.com/stackb/rules_proto/pkg/plugin/envoyproxy/protoc-gen-validate"
 	_ "github.com/stackb/rules_proto/pkg/plugin/gogo/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/golang/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/grpc/grpc"
