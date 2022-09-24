@@ -646,6 +646,7 @@ proto_dependency(
     name = "envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64",
     executable = True,
     repository_rule = "http_file",
+    sha256 = "2abb11753df89d5da7132a46f6bca64cc734ec759983e1f1af260db4416d22da",
     urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-linux-amd64"],
 )
 
