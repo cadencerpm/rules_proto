@@ -164,6 +164,14 @@ load("//deps:protoc_gen_validate_deps.bzl", "protoc_gen_validate_deps")
 protoc_gen_validate_deps()
 
 # ----------------------------------------------------
+# protoc-gen-gotag
+# ----------------------------------------------------
+
+load("//deps:protoc_gen_gotag_deps.bzl", "protoc_gen_gotag_deps")
+
+protoc_gen_gotag_deps()
+
+# ----------------------------------------------------
 # Scala
 # ----------------------------------------------------
 

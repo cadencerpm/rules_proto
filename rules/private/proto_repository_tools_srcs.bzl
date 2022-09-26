@@ -75,6 +75,8 @@ PROTO_REPOSITORY_TOOLS_SRCS = [
     "@build_stack_rules_proto//pkg/plugin/builtin:ruby_plugin.go",
     "@build_stack_rules_proto//pkg/plugin/envoyproxy/protoc-gen-validate:BUILD.bazel",
     "@build_stack_rules_proto//pkg/plugin/envoyproxy/protoc-gen-validate:protoc-gen-validate.go",
+    "@build_stack_rules_proto//pkg/plugin/srikrsna/protoc-gen-gotag:BUILD.bazel",
+    "@build_stack_rules_proto//pkg/plugin/srikrsna/protoc-gen-gotag:protoc-gen-gotag.go",
     "@build_stack_rules_proto//pkg/plugin/gogo/protobuf:BUILD.bazel",
     "@build_stack_rules_proto//pkg/plugin/gogo/protobuf:protoc-gen-gogo.go",
     "@build_stack_rules_proto//pkg/plugin/golang/protobuf:BUILD.bazel",
