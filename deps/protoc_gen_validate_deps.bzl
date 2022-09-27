@@ -2,6 +2,7 @@
 GENERATED FILE - DO NOT EDIT (created via @build_stack_rules_proto//cmd/depsgen)
 """
 
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 def _maybe(repo_rule, name, **kwargs):
@@ -13,6 +14,8 @@ def protoc_gen_validate_deps():
     """
     envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64()  # via <TOP>
     envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64()  # via <TOP>
+    envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64()  # via <TOP>
+
 
 def envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64():
     _maybe(
@@ -33,5 +36,16 @@ def envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64():
         sha256 = "2abb11753df89d5da7132a46f6bca64cc734ec759983e1f1af260db4416d22da",
         urls = [
             "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-linux-amd64",
+        ],
+    )
+
+def envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64():
+    _maybe(
+        http_file,
+        name = "envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64",
+        executable = True,
+        sha256 = "1b5e1f1a2483e6f27a4ab26935c94837fb0f99e17128f156f900b853dbba9e3a",
+        urls = [
+            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-windows-amd64",
         ],
     )
