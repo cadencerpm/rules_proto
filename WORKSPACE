@@ -164,6 +164,14 @@ load("//deps:protoc_gen_validate_deps.bzl", "protoc_gen_validate_deps")
 protoc_gen_validate_deps()
 
 # ----------------------------------------------------
+# protoc-gen-docs
+# ----------------------------------------------------
+
+load("//deps:protoc_gen_doc_deps.bzl", "protoc_gen_doc_deps")
+
+protoc_gen_doc_deps()
+
+# ----------------------------------------------------
 # Scala
 # ----------------------------------------------------
 
@@ -242,6 +250,8 @@ rules_closure_dependencies()
 
 load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories")
 
-node_repositories()
+node_repositories(
+    node_version = "16.6.2",
+)
 
 register_toolchains("//toolchain:nodejs")
