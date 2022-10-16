@@ -123,17 +123,17 @@ depsgen(
     deps = ["//deps:io_grpc_grpc_java"],
 )
 
-# Release: v0.28.0
-# TargetCommitish: release-0.28
-# Date: 2021-07-06 23:21:45 +0000 UTC
-# URL: https://github.com/bazelbuild/rules_go/releases/tag/v0.28.0
-# Size: 687092 (687 kB)
+# Release: v0.35.0
+# TargetCommitish: release-0.35
+# Date: 2022-09-11 15:59:49 +0000 UTC
+# URL: https://github.com/bazelbuild/rules_go/releases/tag/v0.35.0
+# Size: 931734 (932 kB)
 proto_dependency(
     name = "io_bazel_rules_go",
     repository_rule = "http_archive",
-    sha256 = "38171ce619b2695fa095427815d52c2a115c716b15f4cd0525a88c376113f584",
-    strip_prefix = "rules_go-0.28.0",
-    urls = ["https://github.com/bazelbuild/rules_go/archive/v0.28.0.tar.gz"],
+    sha256 = "cc027f11f98aef8bc52c472ced0714994507a16ccd3a0820b2df2d6db695facd",
+    strip_prefix = "rules_go-0.35.0",
+    urls = ["https://github.com/bazelbuild/rules_go/archive/v0.35.0.tar.gz"],
     visibility = ["//visibility:public"],
 )
 
@@ -264,25 +264,19 @@ proto_dependency(
     visibility = ["//visibility:public"],
 )
 
-# Release: v1.35.0
-# Commit: v1.35.x
-# Date: 2021-01-19 18:07:57 +0000 UTC
-# URL: https://github.com/grpc/grpc/releases/tag/v1.35.0
-# Branch: master
-# Commit: 5f759fcd1f602b38004b948b071f8b5726a9a4b1
-# Date: 2021-02-09 05:46:27 +0000 UTC
-# URL: https://github.com/grpc/grpc/commit/5f759fcd1f602b38004b948b071f8b5726a9a4b1
+# Release: v1.42.0
+# Commit: 11f00485aa5ad422cfe2d9d90589158f46954101
+# Date: 2021-11-16 23:39:48 +0000 UTC
+# URL: https://github.com/grpc/grpc/commit/11f00485aa5ad422cfe2d9d90589158f46954101
 #
-# Merge pull request #25384 from gnossen/fix_interop_typo
-#
-# Fix Interop Client Typo
-# Size: 7899154 (7.9 MB)
+# internal_ci: rename grpc_xds_k8s to psm-security as part of tech-debt cleanup and name clarity (#28034) (#28098)
+# Size: 8463684 (8.5 MB)
 proto_dependency(
     name = "com_github_grpc_grpc",
     repository_rule = "http_archive",
-    sha256 = "e6c6b1ac9ba2257c93e49c98ef4fc96b2e2a1cdd90782a919f60e23fa8c2428b",
-    strip_prefix = "grpc-5f759fcd1f602b38004b948b071f8b5726a9a4b1",
-    urls = ["https://github.com/grpc/grpc/archive/5f759fcd1f602b38004b948b071f8b5726a9a4b1.tar.gz"],
+    sha256 = "3db6da6500312cf011ecea4231cdb75ba1dd40440a10c9f807cee805448fc82b",
+    strip_prefix = "grpc-11f00485aa5ad422cfe2d9d90589158f46954101",
+    urls = ["https://github.com/grpc/grpc/archive/11f00485aa5ad422cfe2d9d90589158f46954101.tar.gz"],
     deps = [
         ":build_bazel_rules_swift",
         ":com_google_protobuf",

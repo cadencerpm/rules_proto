@@ -61,8 +61,11 @@ func (s *scalaLibrary) Name() string {
 // KindInfo implements part of the LanguageRule interface.
 func (s *scalaLibrary) KindInfo() rule.KindInfo {
 	return rule.KindInfo{
-		MergeableAttrs: map[string]bool{"srcs": true},
-		ResolveAttrs:   map[string]bool{"deps": true},
+		MergeableAttrs: map[string]bool{
+			"srcs":    true,
+			"exports": true,
+		},
+		ResolveAttrs: map[string]bool{"deps": true},
 	}
 }
 
@@ -85,6 +88,10 @@ func (s *scalaLibrary) ProvideRule(cfg *protoc.LanguageRuleConfig, pc *protoc.Pr
 
 	// the list of output files
 	outputs := make([]string, 0)
+
+	if len(options.plugins) == 0 {
+		log.Printf("warning: the rule %s should have at least one plugin name for the --plugins option.  This informs the rule which plugin(s) outputs correspond to this library rule", s.Name())
+	}
 
 	for _, name := range options.plugins {
 		plugin := getPluginConfiguration(pc.Plugins, name)
@@ -169,6 +176,11 @@ func (s *scalaLibraryRule) Rule(otherGen ...*rule.Rule) *rule.Rule {
 	deps := s.Deps()
 	if len(deps) > 0 {
 		newRule.SetAttr("deps", deps)
+	}
+
+	exports := s.ruleConfig.GetAttr("exports")
+	if len(exports) > 0 {
+		newRule.SetAttr("exports", exports)
 	}
 
 	visibility := s.Visibility()
