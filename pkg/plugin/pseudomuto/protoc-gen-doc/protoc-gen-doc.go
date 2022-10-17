@@ -24,7 +24,7 @@ func (p *protocGenDocPlugin) Configure(ctx *protoc.PluginContext) *protoc.Plugin
 	mappings, _ := protobuf.GetImportMappings(options)
 
 	outputs := p.outputs(ctx.ProtoLibrary, mappings)
-	out := "external/build_stack_rules_proto/plugin/pseudomuto/protoc-gen-doc/markdown.tmpl," + outputs[0] + ",source_relative"
+	out := "external/build_stack_rules_proto/plugin/pseudomuto/protoc-gen-doc/markdown.tmpl," + outputs[0]
 	opts := append(ctx.PluginConfig.GetOptions(), out)
 
 	return &protoc.PluginConfiguration{
