@@ -9,11 +9,15 @@ proto_plugin(
         "@bazel_tools//src/conditions:linux_x86_64": "@com_github_pseudomuto_protoc_gen_doc_v1_5_1_linux_x86_64//:file",
         "@bazel_tools//src/conditions:windows": "@com_github_pseudomuto_protoc_gen_doc_v1_5_1_windows_x86_64//:file",
     }),
+    data = [":markdown.tmpl"],
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "all_files",
-    srcs = ["BUILD.bazel"],
+    srcs = [
+        "BUILD.bazel",
+        "markdown.tmpl",
+    ],
     visibility = ["//plugin:__pkg__"],
 )
