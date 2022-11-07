@@ -92,6 +92,14 @@ load("//:go_deps.bzl", "go_deps")
 go_deps()
 
 # ----------------------------------------------------
+# Third-party proto dependencies
+# ----------------------------------------------------
+
+load("//deps:proto_repositories.bzl", "proto_repositories")
+
+proto_repositories()
+
+# ----------------------------------------------------
 # Core gRPC
 # ----------------------------------------------------
 
@@ -154,6 +162,14 @@ grpc_gateway_deps()
 load("//deps:grpc_gateway_openapiv2_deps.bzl", "grpc_gateway_openapiv2_deps")
 
 grpc_gateway_openapiv2_deps()
+
+# ----------------------------------------------------
+# gRPC Gateway Typescript
+# ----------------------------------------------------
+
+load("//deps:grpc_gateway_ts_deps.bzl", "grpc_gateway_ts_deps")
+
+grpc_gateway_ts_deps()
 
 # ----------------------------------------------------
 # protoc-gen-validate
