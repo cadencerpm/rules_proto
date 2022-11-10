@@ -126,10 +126,17 @@
 # gazelle:proto_rule proto_ts_library attr args --lib ES2015
 # gazelle:proto_rule proto_ts_library deps @npm_tsc//protobufjs
 # gazelle:proto_rule proto_ts_library deps @npm_tsc//long
+# gazelle:proto_rule proto_ts_library resolve google/protobuf/([a-z]+).proto //google/protobuf:wkt_${1}_ts_proto
 
 # gazelle:proto_language ts_proto plugin ts_proto
 # gazelle:proto_language ts_proto rule proto_compile
 # gazelle:proto_language ts_proto rule proto_ts_library
+
+## gRPC Gateway Typescript ##
+# gazelle:proto_plugin protoc-gen-grpc-gateway-ts implementation grpc-ecosystem:grpc-gateway-ts:protoc-gen-grpc-gateway-ts
+# gazelle:proto_plugin protoc-gen-grpc-gateway-ts option fetch_module_directory=example
+# gazelle:proto_plugin protoc-gen-grpc-gateway-ts option fetch_module_filename=grpc-gateway-shared-fetch.pb.ts
+# gazelle:proto_language ts_proto plugin protoc-gen-grpc-gateway-ts
 
 ## closure + grpc.js ##
 # gazelle:proto_plugin closure_js implementation builtin:js:closure
@@ -164,3 +171,5 @@
 # gazelle:proto_language node_js rule proto_nodejs_library
 # gazelle:proto_language node_js rule grpc_nodejs_library
 # gazelle:proto_language node_js rule grpc_web_js_library
+
+exports_files(["config.yaml"])

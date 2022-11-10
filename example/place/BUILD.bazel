@@ -42,6 +42,7 @@ proto_compile(
     outputs = ["place.js"],
     plugins = ["@build_stack_rules_proto//plugin/builtin:closurejs"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_cc_library(
@@ -63,6 +64,7 @@ proto_compile(
     ],
     plugins = ["@build_stack_rules_proto//plugin/builtin:cpp"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_compile(
@@ -71,6 +73,19 @@ proto_compile(
     outputs = ["place.pb.go"],
     plugins = ["@build_stack_rules_proto//plugin/golang/protobuf:protoc-gen-go"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
+)
+
+proto_go_library(
+    name = "place_go_proto",
+    srcs = ["place.pb.go"],
+    importpath = "github.com/stackb/rules_proto/example/place",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//example/thing:thing_go_proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],
 )
 
 proto_go_library(
@@ -91,6 +106,7 @@ proto_compile(
     outputs = ["place.srcjar"],
     plugins = ["@build_stack_rules_proto//plugin/builtin:java"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_java_library(
@@ -113,6 +129,7 @@ proto_compile(
     outputs = ["place_pb.js"],
     plugins = ["@build_stack_rules_proto//plugin/builtin:commonjs"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_nodejs_library(
@@ -132,6 +149,7 @@ proto_compile(
         "@build_stack_rules_proto//plugin/builtin:python",
     ],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_py_library(
@@ -149,6 +167,7 @@ proto_compile(
     outputs = ["place_scala.srcjar"],
     plugins = ["@build_stack_rules_proto//plugin/scalapb/scalapb:protoc-gen-scala"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_scala_library(
@@ -176,6 +195,7 @@ proto_compile(
     outputs = ["place.ts"],
     plugins = ["@build_stack_rules_proto//plugin/stephenh/ts-proto:protoc-gen-ts-proto"],
     proto = "place_proto",
+    visibility = ["//visibility:public"],
 )
 
 proto_ts_library(
