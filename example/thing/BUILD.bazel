@@ -83,17 +83,6 @@ proto_go_library(
     ],
 )
 
-proto_go_library(
-    name = "thing_go_proto",
-    srcs = ["thing.pb.go"],
-    importpath = "github.com/stackb/rules_proto/example/thing",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@org_golang_google_protobuf//reflect/protoreflect",
-        "@org_golang_google_protobuf//runtime/protoimpl",
-    ],
-)
-
 proto_compile(
     name = "thing_java_compile",
     outs = {"@build_stack_rules_proto//plugin/builtin:java": "example/thing/thing.srcjar"},

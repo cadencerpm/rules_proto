@@ -89,18 +89,6 @@ proto_go_library(
     ],
 )
 
-proto_go_library(
-    name = "person_go_proto",
-    srcs = ["person.pb.go"],
-    importpath = "github.com/stackb/rules_proto/example/person",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//example/place:place_go_proto",
-        "@org_golang_google_protobuf//reflect/protoreflect",
-        "@org_golang_google_protobuf//runtime/protoimpl",
-    ],
-)
-
 proto_compile(
     name = "person_java_compile",
     outs = {"@build_stack_rules_proto//plugin/builtin:java": "example/person/person.srcjar"},

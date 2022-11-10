@@ -88,18 +88,6 @@ proto_go_library(
     ],
 )
 
-proto_go_library(
-    name = "place_go_proto",
-    srcs = ["place.pb.go"],
-    importpath = "github.com/stackb/rules_proto/example/place",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//example/thing:thing_go_proto",
-        "@org_golang_google_protobuf//reflect/protoreflect",
-        "@org_golang_google_protobuf//runtime/protoimpl",
-    ],
-)
-
 proto_compile(
     name = "place_java_compile",
     outs = {"@build_stack_rules_proto//plugin/builtin:java": "example/place/place.srcjar"},
