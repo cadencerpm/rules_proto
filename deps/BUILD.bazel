@@ -63,7 +63,7 @@ depsgen(
 depsgen(
     name = "grpc_gateway_ts",
     deps = [
-        ":grpc_gateway_ts_darvin",
+        ":grpc_gateway_ts_darwin",
         ":grpc_gateway_ts_linux",
         ":grpc_gateway_ts_windows",
     ],
@@ -506,7 +506,7 @@ proto_dependency(
 
 # https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
 proto_dependency(
-    name = "grpc_gateway_ts_darvin",
+    name = "grpc_gateway_ts_darwin",
     build_file_content = """
 filegroup(
     name = "exe",

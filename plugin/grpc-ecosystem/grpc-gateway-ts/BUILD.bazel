@@ -4,7 +4,7 @@ proto_plugin(
     name = "protoc-gen-grpc-gateway-ts",
     options = ["paths=source_relative"],
     tool = select({
-        "@bazel_tools//src/conditions:darwin_x86_64": "@grpc_gateway_ts_darvin//:exe",
+        "@bazel_tools//src/conditions:darwin_x86_64": "@grpc_gateway_ts_darwin//:exe",
         "@bazel_tools//src/conditions:linux_x86_64": "@grpc_gateway_ts_linux//:exe",
         "@bazel_tools//src/conditions:windows": "@grpc_gateway_ts_windows//:exe",
     }),
