@@ -2,7 +2,6 @@
 GENERATED FILE - DO NOT EDIT (created via @build_stack_rules_proto//cmd/depsgen)
 """
 
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 def _maybe(repo_rule, name, **kwargs):
@@ -15,7 +14,6 @@ def protoc_gen_validate_deps():
     envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64()  # via <TOP>
     envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64()  # via <TOP>
     envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64()  # via <TOP>
-
 
 def envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64():
     _maybe(

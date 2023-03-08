@@ -63,7 +63,8 @@ depsgen(
 depsgen(
     name = "grpc_gateway_ts",
     deps = [
-        ":grpc_gateway_ts_darwin",
+        ":grpc_gateway_ts_darwin_amd64",
+        ":grpc_gateway_ts_darwin_arm64",
         ":grpc_gateway_ts_linux",
         ":grpc_gateway_ts_windows",
     ],
@@ -506,7 +507,7 @@ proto_dependency(
 
 # https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
 proto_dependency(
-    name = "grpc_gateway_ts_darwin",
+    name = "grpc_gateway_ts_darwin_amd64",
     build_file_content = """
 filegroup(
     name = "exe",
@@ -517,6 +518,21 @@ filegroup(
     repository_rule = "http_archive",
     sha256 = "847349db0bcf0dc48ea8b9887de5bff2326561be3ad89b20c8b21f7163d1903d",
     urls = ["https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/download/v1.1.1/protoc-gen-grpc-gateway-ts_1.1.1_Darwin_amd64.tar.gz"],
+)
+
+# https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
+proto_dependency(
+    name = "grpc_gateway_ts_darwin_arm64",
+    build_file_content = """
+filegroup(
+    name = "exe",
+    srcs = ["protoc-gen-grpc-gateway-ts"],
+    visibility = ["//visibility:public"],
+)
+""",
+    repository_rule = "http_archive",
+    sha256 = "847349db0bcf0dc48ea8b9887de5bf32326561be3ad89b20c8b21f7163d1903d",
+    urls = ["https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/download/v1.1.1/protoc-gen-grpc-gateway-ts_1.1.1_Darwin_arm64.tar.gz"],
 )
 
 # https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
@@ -716,38 +732,38 @@ proto_dependency(
 
 proto_dependency(
     name = "com_github_pseudomuto_protoc_gen_doc_v1_5_1_darwin_x86_64",
-    repository_rule = "http_archive",
-    sha256 = "f429e5a5ddd886bfb68265f2f92c1c6a509780b7adcaf7a8b3be943f28e144ba",
-    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_darwin_amd64.tar.gz"],
     build_file_content = """package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "file",
     srcs = ["protoc-gen-doc"],
 ) """,
+    repository_rule = "http_archive",
+    sha256 = "f429e5a5ddd886bfb68265f2f92c1c6a509780b7adcaf7a8b3be943f28e144ba",
+    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_darwin_amd64.tar.gz"],
 )
 
 proto_dependency(
     name = "com_github_pseudomuto_protoc_gen_doc_v1_5_1_linux_x86_64",
-    repository_rule = "http_archive",
-    sha256 = "47cd72b07e6dab3408d686a65d37d3a6ab616da7d8b564b2bd2a2963a72b72fd",
-    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_amd64.tar.gz"],
     build_file_content = """package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "file",
     srcs = ["protoc-gen-doc"],
 ) """,
+    repository_rule = "http_archive",
+    sha256 = "47cd72b07e6dab3408d686a65d37d3a6ab616da7d8b564b2bd2a2963a72b72fd",
+    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_amd64.tar.gz"],
 )
 
 proto_dependency(
     name = "com_github_pseudomuto_protoc_gen_doc_v1_5_1_windows_x86_64",
-    repository_rule = "http_archive",
-    sha256 = "8acf0bf64eda29183b4c6745c3c6a12562fd9a8ab08d61788cf56e6659c66b3b",
-    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_windows_amd64.tar.gz"],
     build_file_content = """package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "file",
     srcs = ["protoc-gen-doc"],
 ) """,
+    repository_rule = "http_archive",
+    sha256 = "8acf0bf64eda29183b4c6745c3c6a12562fd9a8ab08d61788cf56e6659c66b3b",
+    urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_windows_amd64.tar.gz"],
 )
 
 filegroup(

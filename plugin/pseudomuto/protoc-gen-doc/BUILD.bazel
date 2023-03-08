@@ -2,6 +2,7 @@ load("@build_stack_rules_proto//rules:proto_plugin.bzl", "proto_plugin")
 
 proto_plugin(
     name = "protoc-gen-doc",
+    data = [":markdown.tmpl"],
     direct_mode = True,
     tool = select({
         "@bazel_tools//src/conditions:darwin_arm64": "@com_github_pseudomuto_protoc_gen_doc_v1_5_1_darwin_x86_64//:file",
@@ -9,7 +10,6 @@ proto_plugin(
         "@bazel_tools//src/conditions:linux_x86_64": "@com_github_pseudomuto_protoc_gen_doc_v1_5_1_linux_x86_64//:file",
         "@bazel_tools//src/conditions:windows": "@com_github_pseudomuto_protoc_gen_doc_v1_5_1_windows_x86_64//:file",
     }),
-    data = [":markdown.tmpl"],
     visibility = ["//visibility:public"],
 )
 
