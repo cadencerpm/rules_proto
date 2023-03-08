@@ -107,28 +107,3 @@ func parseProtocGenTsProtoOptions(kindName string, args []string) *protocGenTsPr
 
 	return config
 }
-
-// protocGenTsProtoOptions represents the parsed flag configuration for the
-// ProtocGenTsProto implementation.
-type protocGenTsProtoOptions struct {
-	excludeOutput map[string]bool
-}
-
-func parseProtocGenTsProtoOptions(kindName string, args []string) *protocGenTsProtoOptions {
-	flags := flag.NewFlagSet(kindName, flag.ExitOnError)
-
-	var excludeOutput string
-	flags.StringVar(&excludeOutput, "exclude_output", "", "--exclude_output=foo.ts suppresses the file 'foo.ts' from the output list")
-
-	if err := flags.Parse(args); err != nil {
-		log.Fatalf("failed to parse flags for %q: %v", kindName, err)
-	}
-	config := &protocGenTsProtoOptions{
-		excludeOutput: make(map[string]bool),
-	}
-	for _, value := range strings.Split(excludeOutput, ",") {
-		config.excludeOutput[value] = true
-	}
-
-	return config
-}
