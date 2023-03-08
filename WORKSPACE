@@ -92,6 +92,14 @@ load("//:go_deps.bzl", "go_deps")
 go_deps()
 
 # ----------------------------------------------------
+# Third-party proto dependencies
+# ----------------------------------------------------
+
+load("//deps:proto_repositories.bzl", "proto_repositories")
+
+proto_repositories()
+
+# ----------------------------------------------------
 # Core gRPC
 # ----------------------------------------------------
 
@@ -170,6 +178,14 @@ protoc_gen_validate_deps()
 load("//deps:protoc_gen_doc_deps.bzl", "protoc_gen_doc_deps")
 
 protoc_gen_doc_deps()
+
+# ----------------------------------------------------
+# gRPC Gateway Typescript
+# ----------------------------------------------------
+
+load("//deps:grpc_gateway_ts_deps.bzl", "grpc_gateway_ts_deps")
+
+grpc_gateway_ts_deps()
 
 # ----------------------------------------------------
 # Scala
