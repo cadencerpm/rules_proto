@@ -95,6 +95,8 @@ func main() {
 			log.Fatal(err)
 		}
 
+		fmt.Println("Generated file\n", buf.String())
+
 		if !bytes.Equal(got, buf.Bytes()) {
 			if err := ioutil.WriteFile(*generate, buf.Bytes(), 0666); err != nil {
 				log.Fatal(err)
