@@ -88,6 +88,9 @@ def _proto_repository_tools_impl(ctx):
         "all=-trimpath=" + env["GOPATH"],
         "github.com/stackb/rules_proto/cmd/gazelle",
     ]
+
+    print("Running proto_repository_tools.bzl: " + " ".join(args))
+
     result = env_execute(ctx, args, environment = env)
     if result.return_code:
         fail("failed to build tools: " + result.stderr)
