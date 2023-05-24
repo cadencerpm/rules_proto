@@ -2,6 +2,7 @@
 GENERATED FILE - DO NOT EDIT (created via @build_stack_rules_proto//cmd/depsgen)
 """
 
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _maybe(repo_rule, name, **kwargs):
@@ -16,13 +17,14 @@ def grpc_gateway_ts_deps():
     grpc_gateway_ts_linux()  # via <TOP>
     grpc_gateway_ts_windows()  # via <TOP>
 
+
 def grpc_gateway_ts_darwin_amd64():
     _maybe(
         http_archive,
         name = "grpc_gateway_ts_darwin_amd64",
-        sha256 = "847349db0bcf0dc48ea8b9887de5bff2326561be3ad89b20c8b21f7163d1903d",
+        sha256 = "161418a4a0cdb49027e918f5dff9ce7a7b59866393764add0c72c24e00ee8f07",
         urls = [
-            "https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/download/v1.1.1/protoc-gen-grpc-gateway-ts_1.1.1_Darwin_amd64.tar.gz",
+            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_amd64_patched.tar.gz",
         ],
         build_file_content = """
 filegroup(
@@ -37,9 +39,9 @@ def grpc_gateway_ts_darwin_arm64():
     _maybe(
         http_archive,
         name = "grpc_gateway_ts_darwin_arm64",
-        sha256 = "a16e8e236015cfa006a79971154cd40cf76deaec9c6fe438c60c3999c76c5bf0",
+        sha256 = "07869625ce2dda23775ad19f9d441db84408117a374b852d734a08fbfc3fe963",
         urls = [
-            "https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/download/v1.1.1/protoc-gen-grpc-gateway-ts_1.1.1_Darwin_arm64.tar.gz",
+            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_arm64_patched.tar.gz",
         ],
         build_file_content = """
 filegroup(
@@ -54,9 +56,9 @@ def grpc_gateway_ts_linux():
     _maybe(
         http_archive,
         name = "grpc_gateway_ts_linux",
-        sha256 = "48f69195f2e07ad04058e07561c8bc7253c8e3f758165301985b0109ae74057b",
+        sha256 = "a0578238b252aab1ec686845c47234641df70d6e8873b58cb1cf0d4ce9222711",
         urls = [
-            "https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/download/v1.1.1/protoc-gen-grpc-gateway-ts_1.1.1_Linux_amd64.tar.gz",
+            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Linux_amd64_patched.tar.gz",
         ],
         build_file_content = """
 filegroup(
