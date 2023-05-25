@@ -56,7 +56,7 @@ def grpc_gateway_ts_linux():
     _maybe(
         http_archive,
         name = "grpc_gateway_ts_linux",
-        sha256 = "d42cd8d320cfc39feb9541b3f3998525a498bce12b555c3cb3b55cd52d067d62",
+        sha256 = "5ed370808af541d5bca2e37ce4e5ad839fa8ebe7e9176efde4c0788803978acd",
         urls = [
             "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Linux_amd64_patched.tar.gz",
         ],
