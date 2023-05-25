@@ -516,7 +516,7 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "161418a4a0cdb49027e918f5dff9ce7a7b59866393764add0c72c24e00ee8f07",
+    sha256 = "b2b0508c15514bd60b573863bd1d62fb2726083f1b21494e03fca1ac69f94986",
     urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_amd64_patched.tar.gz"],
 )
 
@@ -531,7 +531,7 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "07869625ce2dda23775ad19f9d441db84408117a374b852d734a08fbfc3fe963",
+    sha256 = "31bb2edbc8159083023c347519b99eefad41e545fb7d2998f2be0b039b4b2919",
     urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_arm64_patched.tar.gz"],
 )
 
@@ -546,7 +546,7 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "a0578238b252aab1ec686845c47234641df70d6e8873b58cb1cf0d4ce9222711",
+    sha256 = "d42cd8d320cfc39feb9541b3f3998525a498bce12b555c3cb3b55cd52d067d62",
     urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Linux_amd64_patched.tar.gz"],
 )
 
