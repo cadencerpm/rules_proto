@@ -108,7 +108,7 @@ type modValue struct {
 }
 
 type modVersionValue struct {
-	path, version, sum string
+	path, name, version, sum string
 }
 
 // Repo describes details of a Go repository known in advance. It is used to
@@ -200,7 +200,7 @@ func (r *RemoteCache) cleanup() error {
 	return os.RemoveAll(r.tmpDir)
 }
 
-var gopkginPattern = regexp.MustCompile(`^(gopkg.in/(?:[^/]+/)?[^/]+\.v\d+)(?:/|$)`)
+var gopkginPattern = regexp.MustCompile("^(gopkg.in/(?:[^/]+/)?[^/]+\\.v\\d+)(?:/|$)")
 
 var knownPrefixes = []struct {
 	prefix  string
@@ -210,23 +210,6 @@ var knownPrefixes = []struct {
 	{prefix: "google.golang.org", missing: 1},
 	{prefix: "cloud.google.com", missing: 1},
 	{prefix: "github.com", missing: 2},
-}
-
-// RootStatic checks the cache to see if the provided importpath matches any known roots.
-// If no matches are found, rather than going out to the network to determine the root,
-// nothing is returned.
-func (r *RemoteCache) RootStatic(importPath string) (root, name string, err error) {
-	for prefix := importPath; prefix != "." && prefix != "/"; prefix = path.Dir(prefix){
-		v, ok, err := r.root.get(prefix)
-		if ok {
-			if err != nil {
-				return "", "", err
-			}
-			value := v.(rootValue)
-			return value.root, value.name, nil
-		}
-	}
-	return "", "", nil
 }
 
 // Root returns the portion of an import path that corresponds to the root
@@ -283,7 +266,6 @@ func (r *RemoteCache) Root(importPath string) (root, name string, err error) {
 		name = label.ImportPathToBazelRepoName(root)
 		return root, name, nil
 	}
-
 
 	// Find the prefix using vcs and cache the result.
 	v, err := r.root.ensure(importPath, func() (interface{}, error) {
@@ -563,7 +545,7 @@ func (rc *RemoteCache) initTmp() {
 		if rc.tmpErr != nil {
 			return
 		}
-		rc.tmpErr = ioutil.WriteFile(filepath.Join(rc.tmpDir, "go.mod"), []byte("module gazelle_remote_cache\ngo 1.15\n"), 0o666)
+		rc.tmpErr = ioutil.WriteFile(filepath.Join(rc.tmpDir, "go.mod"), []byte("module gazelle_remote_cache\ngo 1.15\n"), 0666)
 	})
 }
 

@@ -24,7 +24,7 @@ import (
 	bzl "github.com/bazelbuild/buildtools/build"
 )
 
-func (*goLang) Fix(c *config.Config, f *rule.File) {
+func (_ *goLang) Fix(c *config.Config, f *rule.File) {
 	migrateLibraryEmbed(c, f)
 	migrateGrpcCompilers(c, f)
 	flattenSrcs(c, f)

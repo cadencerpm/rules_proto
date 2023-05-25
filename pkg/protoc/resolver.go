@@ -302,6 +302,7 @@ func ResolveImports(resolver ImportResolver, lang, impLang string, imports []str
 			deps = append(deps, first.Label)
 			// if r.options.Debug {
 			// 	r.options.Printf(lang, imp, "HIT", first.Label)
+			// }
 			// } else {
 			// 	if r.options.Debug {
 			// 		r.options.Printf(lang, imp, "MISS", resolver)

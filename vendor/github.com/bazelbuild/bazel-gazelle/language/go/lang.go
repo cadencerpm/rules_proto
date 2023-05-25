@@ -58,13 +58,12 @@ import "github.com/bazelbuild/bazel-gazelle/language"
 const goName = "go"
 
 type goLang struct {
-	// goPkgRels is a set of relative paths to directories containing buildable
-	// Go code. If the value is false, it means the directory does not contain
-	// buildable Go code, but it has a subdir which does.
+	// goPkgDirs is a set of relative paths to directories containing buildable
+	// Go code, including in subdirectories.
 	goPkgRels map[string]bool
 }
 
-func (*goLang) Name() string { return goName }
+func (_ *goLang) Name() string { return goName }
 
 func NewLanguage() language.Language {
 	return &goLang{goPkgRels: make(map[string]bool)}

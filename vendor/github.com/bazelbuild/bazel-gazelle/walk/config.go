@@ -16,20 +16,13 @@ limitations under the License.
 package walk
 
 import (
-	"bufio"
-	"errors"
 	"flag"
-	"fmt"
-	"io/fs"
 	"log"
-	"os"
 	"path"
-	"strings"
-	"sync"
 
 	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/rule"
-	"github.com/bmatcuk/doublestar/v4"
+	"github.com/bmatcuk/doublestar"
 
 	gzflag "github.com/bazelbuild/bazel-gazelle/flag"
 )
@@ -42,7 +35,6 @@ type walkConfig struct {
 	excludes []string
 	ignore   bool
 	follow   []string
-	loadOnce sync.Once
 }
 
 const walkName = "_walk"
@@ -74,15 +66,15 @@ func (wc *walkConfig) isExcluded(rel, base string) bool {
 
 type Configurer struct{}
 
-func (*Configurer) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
+func (_ *Configurer) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
 	wc := &walkConfig{}
 	c.Exts[walkName] = wc
 	fs.Var(&gzflag.MultiFlag{Values: &wc.excludes}, "exclude", "pattern that should be ignored (may be repeated)")
 }
 
-func (*Configurer) CheckFlags(fs *flag.FlagSet, c *config.Config) error { return nil }
+func (_ *Configurer) CheckFlags(fs *flag.FlagSet, c *config.Config) error { return nil }
 
-func (*Configurer) KnownDirectives() []string {
+func (_ *Configurer) KnownDirectives() []string {
 	return []string{"exclude", "follow", "ignore"}
 }
 
@@ -91,12 +83,6 @@ func (cr *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 	wcCopy := &walkConfig{}
 	*wcCopy = *wc
 	wcCopy.ignore = false
-
-	wc.loadOnce.Do(func() {
-		if err := cr.loadBazelIgnore(c.RepoRoot, wcCopy); err != nil {
-			log.Printf("error loading .bazelignore: %v", err)
-		}
-	})
 
 	if f != nil {
 		for _, d := range f.Directives {
@@ -116,35 +102,6 @@ func (cr *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 	}
 
 	c.Exts[walkName] = wcCopy
-}
-
-func (c *Configurer) loadBazelIgnore(repoRoot string, wc *walkConfig) error {
-	ignorePath := path.Join(repoRoot, ".bazelignore")
-	file, err := os.Open(ignorePath)
-	if errors.Is(err, fs.ErrNotExist) {
-		return nil
-	}
-	if err != nil {
-		return fmt.Errorf(".bazelignore exists but couldn't be read: %v", err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		ignore := strings.TrimSpace(scanner.Text())
-		if ignore == "" || string(ignore[0]) == "#" {
-			continue
-		}
-		// Bazel ignore paths are always relative to repo root.
-		// Glob patterns are not supported.
-		if strings.ContainsAny(ignore, "*?[") {
-			log.Printf("the .bazelignore exclusion pattern must not be a glob %s", ignore)
-			continue
-		}
-		// Ensure we remove trailing slashes or the exclude matching won't work correctly
-		wc.excludes = append(wc.excludes, strings.TrimSuffix(ignore, "/"))
-	}
-	return nil
 }
 
 func checkPathMatchPattern(pattern string) error {

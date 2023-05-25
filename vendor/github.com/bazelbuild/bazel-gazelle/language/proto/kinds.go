@@ -39,5 +39,5 @@ var protoLoads = []rule.LoadInfo{
 	},
 }
 
-func (*protoLang) Kinds() map[string]rule.KindInfo { return protoKinds }
-func (*protoLang) Loads() []rule.LoadInfo          { return protoLoads }
+func (_ *protoLang) Kinds() map[string]rule.KindInfo { return protoKinds }
+func (_ *protoLang) Loads() []rule.LoadInfo          { return protoLoads }

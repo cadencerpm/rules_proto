@@ -62,10 +62,9 @@ func New(repo, pkg, name string) Label {
 var NoLabel = Label{}
 
 var (
-	labelRepoRegexp = regexp.MustCompile(`^@$|^[A-Za-z.-][A-Za-z0-9_.-]*$`)
-	labelPkgRegexp  = regexp.MustCompile(`^[A-Za-z0-9/._@-]*$`)
-	// This was taken from https://docs.bazel.build/versions/main/build-ref.html#name
-	labelNameRegexp = regexp.MustCompile("^[A-Za-z0-9!%-@^_` \"#$&'()*-+,;<=>?\\[\\]{|}~/.]*$")
+	labelRepoRegexp = regexp.MustCompile(`^$|^[A-Za-z][A-Za-z0-9_]*$`)
+	labelPkgRegexp  = regexp.MustCompile(`^[A-Za-z0-9/._-]*$`)
+	labelNameRegexp = regexp.MustCompile(`^[A-Za-z0-9_/.+=,@~-]*$`)
 )
 
 // Parse reads a label from a string.
@@ -78,14 +77,9 @@ func Parse(s string) (Label, error) {
 	if strings.HasPrefix(s, "@") {
 		relative = false
 		endRepo := strings.Index(s, "//")
-		if endRepo > len("@") {
+		if endRepo > 0 {
 			repo = s[len("@"):endRepo]
 			s = s[endRepo:]
-			// If the label begins with "@//...", set repo = "@"
-			// to remain distinct from "//...", where repo = ""
-		} else if endRepo == len("@") {
-			repo = s[:len("@")]
-			s = s[len("@"):]
 		} else {
 			repo = s[len("@"):]
 			s = "//:" + repo
@@ -140,12 +134,8 @@ func (l Label) String() string {
 	}
 
 	var repo string
-	if l.Repo != "" && l.Repo != "@" {
+	if l.Repo != "" {
 		repo = fmt.Sprintf("@%s", l.Repo)
-	} else {
-		// if l.Repo == "", the label string will begin with "//"
-		// if l.Repo == "@", the label string will begin with "@//"
-		repo = l.Repo
 	}
 
 	if path.Base(l.Pkg) == l.Name {

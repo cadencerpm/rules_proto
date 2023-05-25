@@ -31,7 +31,7 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/rule"
 )
 
-func (*protoLang) Imports(c *config.Config, r *rule.Rule, f *rule.File) []resolve.ImportSpec {
+func (_ *protoLang) Imports(c *config.Config, r *rule.Rule, f *rule.File) []resolve.ImportSpec {
 	rel := f.Pkg
 	srcs := r.AttrStrings("srcs")
 	imports := make([]resolve.ImportSpec, len(srcs))
@@ -70,11 +70,11 @@ func (*protoLang) Imports(c *config.Config, r *rule.Rule, f *rule.File) []resolv
 	return imports
 }
 
-func (*protoLang) Embeds(r *rule.Rule, from label.Label) []label.Label {
+func (_ *protoLang) Embeds(r *rule.Rule, from label.Label) []label.Label {
 	return nil
 }
 
-func (*protoLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, importsRaw interface{}, from label.Label) {
+func (_ *protoLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.RemoteCache, r *rule.Rule, importsRaw interface{}, from label.Label) {
 	if importsRaw == nil {
 		// may not be set in tests.
 		return
@@ -84,7 +84,7 @@ func (*protoLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Remo
 	depSet := make(map[string]bool)
 	for _, imp := range imports {
 		l, err := resolveProto(c, ix, r, imp, from)
-		if err == errSkipImport {
+		if err == skipImportError {
 			continue
 		} else if err != nil {
 			log.Print(err)
@@ -104,8 +104,8 @@ func (*protoLang) Resolve(c *config.Config, ix *resolve.RuleIndex, rc *repo.Remo
 }
 
 var (
-	errSkipImport = errors.New("std import")
-	errNotFound   = errors.New("not found")
+	skipImportError = errors.New("std import")
+	notFoundError   = errors.New("not found")
 )
 
 func resolveProto(c *config.Config, ix *resolve.RuleIndex, r *rule.Rule, imp string, from label.Label) (label.Label, error) {
@@ -120,15 +120,15 @@ func resolveProto(c *config.Config, ix *resolve.RuleIndex, r *rule.Rule, imp str
 
 	if l, ok := knownImports[imp]; ok && pc.Mode.ShouldUseKnownImports() {
 		if l.Equal(from) {
-			return label.NoLabel, errSkipImport
+			return label.NoLabel, skipImportError
 		} else {
 			return l, nil
 		}
 	}
 
-	if l, err := resolveWithIndex(c, ix, imp, from); err == nil || err == errSkipImport {
+	if l, err := resolveWithIndex(c, ix, imp, from); err == nil || err == skipImportError {
 		return l, err
-	} else if err != errNotFound {
+	} else if err != notFoundError {
 		return label.NoLabel, err
 	}
 
@@ -143,19 +143,19 @@ func resolveProto(c *config.Config, ix *resolve.RuleIndex, r *rule.Rule, imp str
 func resolveWithIndex(c *config.Config, ix *resolve.RuleIndex, imp string, from label.Label) (label.Label, error) {
 	matches := ix.FindRulesByImportWithConfig(c, resolve.ImportSpec{Lang: "proto", Imp: imp}, "proto")
 	if len(matches) == 0 {
-		return label.NoLabel, errNotFound
+		return label.NoLabel, notFoundError
 	}
 	if len(matches) > 1 {
 		return label.NoLabel, fmt.Errorf("multiple rules (%s and %s) may be imported with %q from %s", matches[0].Label, matches[1].Label, imp, from)
 	}
 	if matches[0].IsSelfImport(from) {
-		return label.NoLabel, errSkipImport
+		return label.NoLabel, skipImportError
 	}
 	return matches[0].Label, nil
 }
 
 // CrossResolve provides dependency resolution logic for the go language extension.
-func (*protoLang) CrossResolve(c *config.Config, ix *resolve.RuleIndex, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+func (_ *protoLang) CrossResolve(c *config.Config, ix *resolve.RuleIndex, imp resolve.ImportSpec, lang string) []resolve.FindResult {
 	if lang != "go" {
 		return nil
 	}

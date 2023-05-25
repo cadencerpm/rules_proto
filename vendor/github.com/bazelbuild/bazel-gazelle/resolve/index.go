@@ -189,8 +189,7 @@ func (ix *RuleIndex) collectEmbeds(r *ruleRecord) {
 			continue
 		}
 		ix.collectEmbeds(er)
-		erResolver := ix.mrslv(er.rule, er.file.Pkg)
-		if resolver.Name() == erResolver.Name() {
+		if resolver == ix.mrslv(er.rule, er.file.Pkg) {
 			er.embedded = true
 			r.embeds = append(r.embeds, er.embeds...)
 		}

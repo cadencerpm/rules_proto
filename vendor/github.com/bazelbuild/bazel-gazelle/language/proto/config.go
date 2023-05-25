@@ -184,7 +184,7 @@ func (f *modeFlag) String() string {
 	return mode.String()
 }
 
-func (*protoLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
+func (_ *protoLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) {
 	pc := &ProtoConfig{}
 	c.Exts[protoName] = pc
 
@@ -196,15 +196,15 @@ func (*protoLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Config) 
 	fs.StringVar(&pc.ImportPrefix, "proto_import_prefix", "", "When set, .proto source files in the srcs attribute of the rule are accessible at their path with this prefix appended on.")
 }
 
-func (*protoLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
+func (_ *protoLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
 	return nil
 }
 
-func (*protoLang) KnownDirectives() []string {
+func (_ *protoLang) KnownDirectives() []string {
 	return []string{"proto", "proto_group", "proto_strip_import_prefix", "proto_import_prefix"}
 }
 
-func (*protoLang) Configure(c *config.Config, rel string, f *rule.File) {
+func (_ *protoLang) Configure(c *config.Config, rel string, f *rule.File) {
 	pc := &ProtoConfig{}
 	*pc = *GetProtoConfig(c)
 	c.Exts[protoName] = pc

@@ -242,7 +242,6 @@ func (s *scalaLibraryRule) Imports(c *config.Config, r *rule.Rule, file *rule.Fi
 		}
 	}
 	from := label.New("", file.Pkg, r.Name())
-
 	provideScalaImports(s.files, protoc.GlobalResolver(), from, pluginOptions)
 
 	// 2. create import specs for 'protobuf scala'.  This allows
@@ -258,10 +257,7 @@ func (s *scalaLibraryRule) Resolve(c *config.Config, ix *resolve.RuleIndex, r *r
 	resolveFn(c, ix, r, imports, from)
 
 	if unresolvedDeps, ok := r.PrivateAttr(protoc.UnresolvedDepsPrivateKey).(map[string]error); ok {
-		if from.Repo == c.RepoName {
-			from.Repo = ""
-		}
-		resolveScalaDeps(resolve.FindRuleWithOverride, ix.FindRulesByImportWithConfig, c, r, unresolvedDeps, from)
+		resolveScalaDeps(c, ix, r, unresolvedDeps, from)
 
 		for imp, err := range unresolvedDeps {
 			if err == nil {
@@ -272,46 +268,24 @@ func (s *scalaLibraryRule) Resolve(c *config.Config, ix *resolve.RuleIndex, r *r
 	}
 }
 
-// findRuleWithOverride is the same shape of resolve.FindRuleWithOverride.
-type findRuleWithOverride func(c *config.Config, imp resolve.ImportSpec, lang string) (label.Label, bool)
-
-// findRulesByImportWithConfig is the same shape of resolve.RuleIndex.FindRulesByImportWithConfig.
-// For testability want to avoid the RuleIndex as it is fundamentally tied to the resolve.resolveConfig,
-// which is private and not easily mocked.
-type findRulesByImportWithConfig func(c *config.Config, imp resolve.ImportSpec, lang string) []resolve.FindResult
-
 // resolveScalaDeps attempts to resolve labels for the given deps under the
 // "scala" language.  Only unresolved deps of type ErrNoLabel are considered.
 // Typically these unresolved dependencies arise from (scalapb.options) imports.
-func resolveScalaDeps(
-	findRuleWithOverride findRuleWithOverride,
-	findRulesByImportWithConfig findRulesByImportWithConfig,
-	c *config.Config,
-	r *rule.Rule,
-	unresolvedDeps map[string]error,
-	from label.Label,
-) {
+func resolveScalaDeps(c *config.Config, ix *resolve.RuleIndex, r *rule.Rule, unresolvedDeps map[string]error, from label.Label) {
+	lang := "scala"
 
 	resolvedDeps := make([]string, 0)
-
-	markResolved := func(imp string, to label.Label) {
-		delete(unresolvedDeps, imp)
-		if to == from {
-			return
-		}
-		resolvedDeps = append(resolvedDeps, to.String())
-	}
-
 	for imp, err := range unresolvedDeps {
 		if err != protoc.ErrNoLabel {
 			continue
 		}
-		importSpec := resolve.ImportSpec{Lang: scalaLangName, Imp: imp}
-		if l, ok := findRuleWithOverride(c, importSpec, scalaLangName); ok {
-			markResolved(imp, l)
+		importSpec := resolve.ImportSpec{Lang: lang, Imp: imp}
+		if l, ok := resolve.FindRuleWithOverride(c, importSpec, lang); ok {
+			resolvedDeps = append(resolvedDeps, l.String())
+			unresolvedDeps[imp] = nil
 			continue
 		}
-		result := findRulesByImportWithConfig(c, importSpec, scalaLangName)
+		result := ix.FindRulesByImportWithConfig(c, importSpec, lang)
 		if len(result) == 0 {
 			continue
 		}
@@ -319,7 +293,8 @@ func resolveScalaDeps(
 			log.Println(from, "multiple rules matched for scala import %q: %v", imp, result)
 			continue
 		}
-		markResolved(imp, result[0].Label)
+		resolvedDeps = append(resolvedDeps, result[0].Label.String())
+		unresolvedDeps[imp] = nil
 	}
 	if len(resolvedDeps) > 0 {
 		r.SetAttr("deps", protoc.DeduplicateAndSort(append(r.AttrStrings("deps"), resolvedDeps...)))
@@ -383,14 +358,14 @@ func provideScalaImports(files []*protoc.File, resolver protoc.ImportResolver, f
 			pkgName = javaPackageName
 		}
 		if pkgName != "" {
-			resolver.Provide(lang, "package", pkgName, from)
+			resolver.Provide(lang, lang, pkgName, from)
 		}
 		for _, e := range file.Enums() {
 			name := e.Name
 			if pkgName != "" {
 				name = pkgName + "." + name
 			}
-			resolver.Provide(lang, "enum", name, from)
+			resolver.Provide(lang, lang, name, from)
 			for _, value := range e.Elements {
 				if field, ok := value.(*proto.EnumField); ok {
 					fieldName := name + "." + field.Name
@@ -403,26 +378,26 @@ func provideScalaImports(files []*protoc.File, resolver protoc.ImportResolver, f
 			if pkgName != "" {
 				name = pkgName + "." + name
 			}
-			resolver.Provide(lang, "message", name, from)
-			resolver.Provide(lang, "message", name+"Proto", from)
+			resolver.Provide(lang, lang, name, from)
+			resolver.Provide(lang, lang, name+"Proto", from)
 		}
 		for _, s := range file.Services() {
 			name := s.Name
 			if pkgName != "" {
 				name = pkgName + "." + name
 			}
-			resolver.Provide(lang, "service", name, from)
-			resolver.Provide(lang, "service", name+"Grpc", from)
-			resolver.Provide(lang, "service", name+"Proto", from)
-			resolver.Provide(lang, "service", name+"Client", from)
-			resolver.Provide(lang, "service", name+"Handler", from)
-			resolver.Provide(lang, "service", name+"Server", from)
+			resolver.Provide(lang, lang, name, from)
+			resolver.Provide(lang, lang, name+"Grpc", from)
+			resolver.Provide(lang, lang, name+"Proto", from)
+			resolver.Provide(lang, lang, name+"Client", from)
+			resolver.Provide(lang, lang, name+"Handler", from)
+			resolver.Provide(lang, lang, name+"Server", from)
 			// TOOD: if this is configured on the proto_plugin, we won't know
 			// about the plugin option.  Advertise them anyway.
 			// if options["server_power_apis"] {
-			resolver.Provide(lang, "service", name+"PowerApi", from)
-			resolver.Provide(lang, "service", name+"PowerApiHandler", from)
-			resolver.Provide(lang, "service", name+"ClientPowerApi", from)
+			resolver.Provide(lang, lang, name+"PowerApi", from)
+			resolver.Provide(lang, lang, name+"PowerApiHandler", from)
+			resolver.Provide(lang, lang, name+"ClientPowerApi", from)
 			// }
 		}
 	}

@@ -38,7 +38,7 @@ import (
 	bzl "github.com/bazelbuild/buildtools/build"
 )
 
-var minimumRulesGoVersion = version.Version{0, 29, 0}
+var minimumRulesGoVersion = version.Version{0, 20, 0}
 
 // goConfig contains configuration values related to Go rules.
 type goConfig struct {
@@ -199,13 +199,8 @@ type dependencyMode int
 
 const (
 	// externalMode indicates imports should be resolved to external dependencies
-	// (declared in WORKSPACE). Calls out to the network if an import can't be resolved
-	// locally.
+	// (declared in WORKSPACE).
 	externalMode dependencyMode = iota
-
-	// staticMode indicates imports should be resolved only to dependencies known by
-	// Gazelle (declared in WORKSPACE). Unknown imports are ignored.
-	staticMode
 
 	// vendorMode indicates imports should be resolved to libraries in the
 	// vendor directory.
@@ -213,15 +208,11 @@ const (
 )
 
 func (m dependencyMode) String() string {
-	switch m {
-	case externalMode:
+	if m == externalMode {
 		return "external"
-	case staticMode:
-		return "static"
-	case vendorMode:
-		return "vendor"
+	} else {
+		return "vendored"
 	}
-	return ""
 }
 
 type externalFlag struct {
@@ -232,8 +223,6 @@ func (f *externalFlag) Set(value string) error {
 	switch value {
 	case "external":
 		*f.depMode = externalMode
-	case "static":
-		*f.depMode = staticMode
 	case "vendored":
 		*f.depMode = vendorMode
 	default:
@@ -331,11 +320,9 @@ type moduleRepo struct {
 	repoName, modulePath string
 }
 
-var (
-	validBuildExternalAttr       = []string{"external", "vendored"}
-	validBuildFileGenerationAttr = []string{"auto", "on", "off"}
-	validBuildFileProtoModeAttr  = []string{"default", "legacy", "disable", "disable_global", "package"}
-)
+var validBuildExternalAttr = []string{"external", "vendored"}
+var validBuildFileGenerationAttr = []string{"auto", "on", "off"}
+var validBuildFileProtoModeAttr = []string{"default", "legacy", "disable", "disable_global", "package"}
 
 func (*goLang) KnownDirectives() []string {
 	return []string{
@@ -531,9 +518,7 @@ Update io_bazel_rules_go to a newer version in your WORKSPACE file.`
 					continue
 				}
 				gc.preprocessTags()
-				if err := gc.setBuildTags(d.Value); err != nil {
-					log.Print(err)
-				}
+				gc.setBuildTags(d.Value)
 
 			case "go_generate_proto":
 				if goGenerateProto, err := strconv.ParseBool(d.Value); err == nil {
