@@ -61,6 +61,15 @@ depsgen(
 )
 
 depsgen(
+    name = "protoc_gen_go_aip",
+    deps = [
+        ":com_github_einride_protoc_gen_go_aip_v0_60_darwin_x86_64",
+        ":com_github_einride_protoc_gen_go_aip_v0_60_linux_x86_64",
+        ":com_github_einride_protoc_gen_go_aip_v0_60_windows_x86_64",
+    ],
+)
+
+depsgen(
     name = "grpc_gateway_ts",
     deps = [
         ":grpc_gateway_ts_darwin_amd64",
@@ -764,6 +773,42 @@ filegroup(
     repository_rule = "http_archive",
     sha256 = "8acf0bf64eda29183b4c6745c3c6a12562fd9a8ab08d61788cf56e6659c66b3b",
     urls = ["https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_windows_amd64.tar.gz"],
+)
+
+proto_dependency(
+    name = "com_github_einride_protoc_gen_go_aip_v0_60_darwin_x86_64",
+    build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-go-aip"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "7e3154054ceae08771a1cfd39c34ad0282835a723d594bee53b3daea95926c53",
+    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-go-aip-0.60/protoc-gen-go-aip_0.60_Darwin_amd64.tar.gz"],
+)
+
+proto_dependency(
+    name = "com_github_einride_protoc_gen_go_aip_v0_60_linux_x86_64",
+    build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-go-aip"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "3e7ff37a340c0d78b45a6d4602e6606b6bc85d263f7ce045c9a2647d4eee11a2",
+    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-go-aip-0.60/protoc-gen-go-aip_0.60_Linux_amd64.tar.gz"],
+)
+
+proto_dependency(
+    name = "com_github_einride_protoc_gen_go_aip_v0_60_windows_x86_64",
+    build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-go-aip"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "8acf0bf64eda29183b4c6745c3c6a12562fd9a8ab08d61788cf56e6659c66b3b",
+    urls = ["https://github.com/cadencerpm/rules_proto/releases/tag/protoc-gen-go-aip-0.60/protoc-gen-go-aip_0.60_Linux_amd64.tar.gz"],
 )
 
 filegroup(

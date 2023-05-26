@@ -76,6 +76,8 @@ PROTO_REPOSITORY_TOOLS_SRCS = [
     "@build_stack_rules_proto//pkg/plugin/envoyproxy/protoc-gen-validate:protoc-gen-validate.go",
     "@build_stack_rules_proto//pkg/plugin/pseudomuto/protoc-gen-doc:BUILD.bazel",
     "@build_stack_rules_proto//pkg/plugin/pseudomuto/protoc-gen-doc:protoc-gen-doc.go",
+    "@build_stack_rules_proto//pkg/plugin/einride/protoc-gen-go-aip:BUILD.bazel",
+    "@build_stack_rules_proto//pkg/plugin/einride/protoc-gen-go-aip:protoc-gen-go-aip.go",
     "@build_stack_rules_proto//pkg/plugin/gogo/protobuf:BUILD.bazel",
     "@build_stack_rules_proto//pkg/plugin/gogo/protobuf:protoc-gen-gogo.go",
     "@build_stack_rules_proto//pkg/plugin/golang/protobuf:BUILD.bazel",
