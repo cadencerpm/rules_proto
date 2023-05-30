@@ -2,7 +2,8 @@
 GENERATED FILE - DO NOT EDIT (created via @build_stack_rules_proto//cmd/depsgen)
 """
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _maybe(repo_rule, name, **kwargs):
     if name not in native.existing_rules():
@@ -11,39 +12,52 @@ def _maybe(repo_rule, name, **kwargs):
 def protoc_gen_validate_deps():
     """protoc_gen_validate dependency macro
     """
-    envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64()  # via <TOP>
-    envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64()  # via <TOP>
-    envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64()  # via <TOP>
+    envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64()  # via <TOP>
+    envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64()  # via <TOP>
+    envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64()  # via <TOP>
 
-def envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64():
+
+def envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64():
     _maybe(
-        http_file,
-        name = "envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64",
-        executable = True,
-        sha256 = "b17d8c08e5da6ecc8e48e9fdfedbdd9b40d3209ec01ebbfa53e2490f040bb3c8",
+        http_archive,
+        name = "envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64",
+        sha256 = "cb1f321fa1f181ad67c8416c50fc2a09d181134b34d731c1da4e58c2f069af0e",
         urls = [
-            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-darwin-amd64",
+            "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_darwin_amd64.tar.gz",
         ],
+        build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-validate-go"],
+) """,
     )
 
-def envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64():
+def envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64():
     _maybe(
-        http_file,
-        name = "envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64",
-        executable = True,
-        sha256 = "2abb11753df89d5da7132a46f6bca64cc734ec759983e1f1af260db4416d22da",
+        http_archive,
+        name = "envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64",
+        sha256 = "427f6cd62015ffe2db5f6bb59aca7dd395e61f431a3228667ca7fb3e052372bb",
         urls = [
-            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-linux-amd64",
+            "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_linux_amd64.tar.gz",
         ],
+        build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-doc"],
+) """,
     )
 
-def envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64():
+def envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64():
     _maybe(
-        http_file,
-        name = "envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64",
-        executable = True,
-        sha256 = "1b5e1f1a2483e6f27a4ab26935c94837fb0f99e17128f156f900b853dbba9e3a",
+        http_archive,
+        name = "envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64",
+        sha256 = "4d40d9063114c46fe6dee1ff1e565587acbdace8b8d3bf15c4bc3daf09a65576",
         urls = [
-            "https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-windows-amd64",
+            "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_windows_amd64.tar.gz",
         ],
+        build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "file",
+    srcs = ["protoc-gen-doc"],
+) """,
     )

@@ -45,9 +45,9 @@ depsgen(
 depsgen(
     name = "protoc_gen_validate",
     deps = [
-        ":envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64",
-        ":envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64",
-        ":envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64",
+        ":envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64",
+        ":envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64",
+        ":envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64",
     ],
 )
 
@@ -716,27 +716,39 @@ proto_dependency(
 )
 
 proto_dependency(
-    name = "envoyproxy_protoc_gen_validate_v0_6_7_darwin_x86_64",
-    executable = True,
-    repository_rule = "http_file",
-    sha256 = "b17d8c08e5da6ecc8e48e9fdfedbdd9b40d3209ec01ebbfa53e2490f040bb3c8",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-darwin-amd64"],
+    name = "envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64",
+     build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "protoc-gen-validate-go",
+    srcs = ["protoc-gen-validate-go"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "cb1f321fa1f181ad67c8416c50fc2a09d181134b34d731c1da4e58c2f069af0e",
+    urls = ["https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_darwin_amd64.tar.gz"],
 )
 
 proto_dependency(
-    name = "envoyproxy_protoc_gen_validate_v0_6_7_linux_x86_64",
-    executable = True,
-    repository_rule = "http_file",
-    sha256 = "2abb11753df89d5da7132a46f6bca64cc734ec759983e1f1af260db4416d22da",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-linux-amd64"],
+    name = "envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64",
+     build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "protoc-gen-validate-go",
+    srcs = ["protoc-gen-doc"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "427f6cd62015ffe2db5f6bb59aca7dd395e61f431a3228667ca7fb3e052372bb",
+    urls = ["https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_linux_amd64.tar.gz"]
 )
 
 proto_dependency(
-    name = "envoyproxy_protoc_gen_validate_v0_6_7_windows_x86_64",
-    executable = True,
-    repository_rule = "http_file",
-    sha256 = "1b5e1f1a2483e6f27a4ab26935c94837fb0f99e17128f156f900b853dbba9e3a",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-validate-0.6.7/protoc-gen-validate-windows-amd64"],
+    name = "envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64",
+     build_file_content = """package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "protoc-gen-validate-go",
+    srcs = ["protoc-gen-doc"],
+) """,
+    repository_rule = "http_archive",
+    sha256 = "4d40d9063114c46fe6dee1ff1e565587acbdace8b8d3bf15c4bc3daf09a65576",
+    urls = ["https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_windows_amd64.tar.gz"],
 )
 
 proto_dependency(
