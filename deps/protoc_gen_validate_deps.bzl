@@ -26,10 +26,9 @@ def envoyproxy_protoc_gen_validate_v1_0_1_darwin_x86_64():
             "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_darwin_amd64.tar.gz",
         ],
         build_file_content = """package(default_visibility = ["//visibility:public"])
-filegroup(
-    name = "file",
-    srcs = ["protoc-gen-validate-go"],
-) """,
+
+exports_files(["protoc-gen-validate-go"])
+""",
     )
 
 def envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64():
@@ -41,10 +40,9 @@ def envoyproxy_protoc_gen_validate_v1_0_1_linux_x86_64():
             "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_linux_amd64.tar.gz",
         ],
         build_file_content = """package(default_visibility = ["//visibility:public"])
-filegroup(
-    name = "file",
-    srcs = ["protoc-gen-doc"],
-) """,
+
+exports_files(["protoc-gen-validate-go"])
+""",
     )
 
 def envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64():
@@ -56,8 +54,7 @@ def envoyproxy_protoc_gen_validate_v1_0_1_windows_x86_64():
             "https://github.com/bufbuild/protoc-gen-validate/releases/download/v1.0.1/protoc-gen-validate_1.0.1_windows_amd64.tar.gz",
         ],
         build_file_content = """package(default_visibility = ["//visibility:public"])
-filegroup(
-    name = "file",
-    srcs = ["protoc-gen-doc"],
-) """,
+
+exports_files(["protoc-gen-validate-go"])
+""",
     )
