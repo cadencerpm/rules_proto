@@ -514,7 +514,7 @@ proto_dependency(
     urls = ["https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v2.10.0/protoc-gen-openapiv2-v2.10.0-windows-x86_64.exe"],
 )
 
-# https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
+# https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3
 proto_dependency(
     name = "grpc_gateway_ts_darwin_amd64",
     build_file_content = """
@@ -525,11 +525,11 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "b2b0508c15514bd60b573863bd1d62fb2726083f1b21494e03fca1ac69f94986",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_amd64_patched.tar.gz"],
+    sha256 = "67de8838133476641342900918e4ab1bf8045912404350c9f1acba751cf73ec1",
+    urls = ["https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3/protoc-gen-grpc-gateway-ts-darwin-amd64.tar.gz"],
 )
 
-# https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
+# https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3
 proto_dependency(
     name = "grpc_gateway_ts_darwin_arm64",
     build_file_content = """
@@ -540,11 +540,11 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "31bb2edbc8159083023c347519b99eefad41e545fb7d2998f2be0b039b4b2919",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Darwin_arm64_patched.tar.gz"],
+    sha256 = "40b94ddc653b8c9ba4edc4ee9499790b36cd15f26d77308678487e139bb381aa",
+    urls = ["https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3/protoc-gen-grpc-gateway-ts-darwin-arm64.tar.gz"],
 )
 
-# https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
+# https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3
 proto_dependency(
     name = "grpc_gateway_ts_linux",
     build_file_content = """
@@ -555,8 +555,8 @@ filegroup(
 )
 """,
     repository_rule = "http_archive",
-    sha256 = "5ed370808af541d5bca2e37ce4e5ad839fa8ebe7e9176efde4c0788803978acd",
-    urls = ["https://github.com/cadencerpm/rules_proto/releases/download/protoc-gen-grpc-gateway-ts_1.1.2/protoc-gen-grpc-gateway-ts_1.1.2_Linux_amd64_patched.tar.gz"],
+    sha256 = "7c7a255f62d2571b6e2c50a84a958967ab0499462966108c8585be3055d08b73",
+    urls = ["https://github.com/cadencerpm/protoc-gen-grpc-gateway-ts/releases/download/v1.1.3/protoc-gen-grpc-gateway-ts-linux-amd64.tar.gz"],
 )
 
 # https://github.com/grpc-ecosystem/protoc-gen-grpc-gateway-ts/releases/tag/v1.1.1
