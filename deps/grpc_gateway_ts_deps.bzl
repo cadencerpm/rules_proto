@@ -29,7 +29,7 @@ def grpc_gateway_ts_darwin_amd64():
         build_file_content = """
 filegroup(
     name = "exe",
-    srcs = ["protoc-gen-grpc-gateway-ts"],
+    srcs = ["protoc-gen-grpc-gateway-ts-darwin-amd64"],
     visibility = ["//visibility:public"],
 )
 """,
@@ -46,7 +46,7 @@ def grpc_gateway_ts_darwin_arm64():
         build_file_content = """
 filegroup(
     name = "exe",
-    srcs = ["protoc-gen-grpc-gateway-ts"],
+    srcs = ["protoc-gen-grpc-gateway-ts-darwin-arm64"],
     visibility = ["//visibility:public"],
 )
 """,
@@ -63,7 +63,7 @@ def grpc_gateway_ts_linux():
         build_file_content = """
 filegroup(
     name = "exe",
-    srcs = ["protoc-gen-grpc-gateway-ts"],
+    srcs = ["protoc-gen-grpc-gateway-ts-linux-amd64"],
     visibility = ["//visibility:public"],
 )
 """,
