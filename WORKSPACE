@@ -188,6 +188,14 @@ load("//deps:protoc_gen_go_aip_deps.bzl", "protoc_gen_go_aip_deps")
 protoc_gen_go_aip_deps()
 
 # ----------------------------------------------------
+# protoc-gen-cadence-aip-go
+# ----------------------------------------------------
+
+load("//deps:protoc_gen_cadence_aip_go_deps.bzl", "protoc_gen_cadence_aip_go_deps")
+
+protoc_gen_cadence_aip_go_deps()
+
+# ----------------------------------------------------
 # gRPC Gateway Typescript
 # ----------------------------------------------------
 

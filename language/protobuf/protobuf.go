@@ -9,6 +9,7 @@ import (
 	_ "github.com/stackb/rules_proto/pkg/plugin/envoyproxy/protoc-gen-validate"
 	_ "github.com/stackb/rules_proto/pkg/plugin/pseudomuto/protoc-gen-doc"
 	_ "github.com/stackb/rules_proto/pkg/plugin/einride/protoc-gen-go-aip"
+	_ "github.com/stackb/rules_proto/pkg/plugin/cadence/protoc-gen-cadence-aip-go"
 	_ "github.com/stackb/rules_proto/pkg/plugin/gogo/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/golang/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/grpc/grpc"

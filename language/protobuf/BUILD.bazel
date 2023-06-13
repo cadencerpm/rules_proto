@@ -20,6 +20,7 @@ go_library(
         "//pkg/plugin/grpcecosystem/grpcgatewayts",
         "//pkg/plugin/pseudomuto/protoc-gen-doc",
         "//pkg/plugin/einride/protoc-gen-go-aip",
+        "//pkg/plugin/cadence/protoc-gen-cadence-aip-go",
         "//pkg/plugin/scalapb/scalapb",
         "//pkg/plugin/stackb/grpc_js",
         "//pkg/plugin/stephenh/ts-proto",
