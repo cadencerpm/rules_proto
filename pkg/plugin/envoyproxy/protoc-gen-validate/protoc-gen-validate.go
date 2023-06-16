@@ -38,9 +38,6 @@ func (p *protcGenValidatePlugin) shouldApply(lib protoc.ProtoLibrary) bool {
 func (p *protcGenValidatePlugin) outputs(rel string, lib protoc.ProtoLibrary) []string {
 	srcs := make([]string, 0)
 	for _, f := range lib.Files() {
-		if !f.HasServices() {
-			continue
-		}
 		base := f.Name
 		if rel != "" {
 			base = path.Join(rel, base)
