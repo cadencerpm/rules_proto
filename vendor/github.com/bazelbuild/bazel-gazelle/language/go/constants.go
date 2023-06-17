@@ -35,10 +35,7 @@ const (
 	// "compilers" attribute of go_proto_library rules.
 	grpcCompilerLabel = "@io_bazel_rules_go//proto:go_grpc"
 
-	// wellKnownTypesGoPrefix is the import path for the Go repository containing
-	// pre-generated code for the Well Known Types.
-	wellKnownTypesGoPrefix = "github.com/golang/protobuf"
-
-	// wellKnownTypesPkg is the package name for the predefined WKTs in rules_go.
-	wellKnownTypesPkg = "proto/wkt"
+	// goProtoSuffix is the suffix applied to the labels of all generated
+	// go_proto_library targets.
+	goProtoSuffix = "_go_proto"
 )

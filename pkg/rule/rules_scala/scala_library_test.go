@@ -4,8 +4,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/bazelbuild/bazel-gazelle/config"
 	"github.com/bazelbuild/bazel-gazelle/label"
 	"github.com/bazelbuild/bazel-gazelle/resolve"
+	"github.com/bazelbuild/bazel-gazelle/rule"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stackb/rules_proto/pkg/protoc"
 )
@@ -44,6 +46,42 @@ func TestGetJavaPackageOption(t *testing.T) {
 	}
 }
 
+// TestParseScalaImportNamedLiteral asserts the ability to parse
+// a subset of scala import expressions.
+func TestParseScalaImportNamedLiteral(t *testing.T) {
+	for name, tc := range map[string]struct {
+		imp  string
+		want []string
+	}{
+		"degenerate": {
+			want: []string{""},
+		},
+		"single import": {
+			imp:  "a.b.c.Foo",
+			want: []string{"a.b.c.Foo"},
+		},
+		"multiple import": {
+			imp:  "a.b.c.{Foo,Bar}",
+			want: []string{"a.b.c.Foo", "a.b.c.Bar"},
+		},
+		"multiple import +ws": {
+			imp:  "a.b.c.{ Foo  , Bar  }  ",
+			want: []string{"a.b.c.Foo", "a.b.c.Bar"},
+		},
+		"alias import": {
+			imp:  "a.b.c.{ Foo => Fog , Bar => Baz }",
+			want: []string{"a.b.c.Foo", "a.b.c.Bar"},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			got := parseScalaImportNamedLiteral(tc.imp)
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("(-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
 // TestGetScalapbImports shows that an import named in (scalapb.options) works as expected.
 func TestGetScalapbImports(t *testing.T) {
 	for name, tc := range map[string]struct {
@@ -72,6 +110,18 @@ option (scalapb.options) = {
 			},
 			want: []string{"corp.common.utils.WithORM"},
 		},
+		"with scalapb import (aliased)": {
+			in: map[string]string{
+				"foo.proto": `syntax = "proto3";
+import "scalapb/scalapb.proto";
+
+option (scalapb.options) = {
+	import: "corp.common.utils.{WithORM => WithORMAlias}"
+};`,
+			},
+			want: []string{"corp.common.utils.WithORM"},
+		},
+
 		"with field type": {
 			in: map[string]string{
 				"foo.proto": `
@@ -126,8 +176,8 @@ func TestProvideScalaImports(t *testing.T) {
 message Thing {}`,
 			},
 			want: []resolve.ImportSpec{
-				{Lang: "scala", Imp: "Thing"},
-				{Lang: "scala", Imp: "ThingProto"},
+				{Lang: "message", Imp: "Thing"},
+				{Lang: "message", Imp: "ThingProto"},
 			},
 		},
 		"service": {
@@ -136,15 +186,15 @@ message Thing {}`,
 service Thinger {}`,
 			},
 			want: []resolve.ImportSpec{
-				{Lang: "scala", Imp: "Thinger"},
-				{Lang: "scala", Imp: "ThingerGrpc"},
-				{Lang: "scala", Imp: "ThingerProto"},
-				{Lang: "scala", Imp: "ThingerClient"},
-				{Lang: "scala", Imp: "ThingerHandler"},
-				{Lang: "scala", Imp: "ThingerServer"},
-				{Lang: "scala", Imp: "ThingerPowerApi"},
-				{Lang: "scala", Imp: "ThingerPowerApiHandler"},
-				{Lang: "scala", Imp: "ThingerClientPowerApi"},
+				{Lang: "service", Imp: "Thinger"},
+				{Lang: "service", Imp: "ThingerGrpc"},
+				{Lang: "service", Imp: "ThingerProto"},
+				{Lang: "service", Imp: "ThingerClient"},
+				{Lang: "service", Imp: "ThingerHandler"},
+				{Lang: "service", Imp: "ThingerServer"},
+				{Lang: "service", Imp: "ThingerPowerApi"},
+				{Lang: "service", Imp: "ThingerPowerApiHandler"},
+				{Lang: "service", Imp: "ThingerClientPowerApi"},
 			},
 		},
 		"enum": {
@@ -153,7 +203,7 @@ service Thinger {}`,
 enum Things {}`,
 			},
 			want: []resolve.ImportSpec{
-				{Lang: "scala", Imp: "Things"},
+				{Lang: "enum", Imp: "Things"},
 			},
 		},
 	} {
@@ -256,4 +306,105 @@ func TestScalaLibraryOptionsNoOutput(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestResolveScalaDeps(t *testing.T) {
+	for name, tc := range map[string]struct {
+		overrideFn         findRuleWithOverride
+		byImportFn         findRulesByImportWithConfig
+		r                  *rule.Rule
+		from               label.Label
+		unresolvedDeps     map[string]error
+		wantUnresolvedDeps map[string]error
+		wantDeps           []string
+	}{
+		"degenerate case": {
+			overrideFn: func(c *config.Config, imp resolve.ImportSpec, lang string) (label.Label, bool) {
+				return label.NoLabel, false
+			},
+			byImportFn: func(c *config.Config, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+				return nil
+			},
+			wantUnresolvedDeps: map[string]error{},
+		},
+		"resolve from cross-resolver": {
+			from: label.New("", "proto", "foo_proto_scala_library"),
+			overrideFn: func(c *config.Config, imp resolve.ImportSpec, lang string) (label.Label, bool) {
+				return label.NoLabel, false
+			},
+			byImportFn: func(c *config.Config, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+				if lang == "scala" && imp.Imp == "foo.bar.baz.mapper" {
+					return []resolve.FindResult{{Label: label.New("", "mapper", "scala_lib")}}
+				}
+				return nil
+			},
+			unresolvedDeps: map[string]error{
+				"foo.bar.baz.mapper": protoc.ErrNoLabel,
+			},
+			wantUnresolvedDeps: map[string]error{},
+			wantDeps:           []string{"//mapper:scala_lib"},
+		},
+		"resolve from overrideFn": {
+			from: label.New("", "proto", "foo_proto_scala_library"),
+			overrideFn: func(c *config.Config, imp resolve.ImportSpec, lang string) (label.Label, bool) {
+				if imp.Lang == "scala" && imp.Imp == "foo.bar.baz.mapper" {
+					return label.New("", "mapper", "scala_lib"), true
+				}
+				return label.NoLabel, false
+			},
+			byImportFn: func(c *config.Config, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+				return nil
+			},
+			unresolvedDeps: map[string]error{
+				"foo.bar.baz.mapper": protoc.ErrNoLabel,
+			},
+			wantUnresolvedDeps: map[string]error{},
+			wantDeps:           []string{"//mapper:scala_lib"},
+		},
+		"does not resolve self-label": {
+			from: label.New("", "proto", "foo_proto_scala_library"),
+			overrideFn: func(c *config.Config, imp resolve.ImportSpec, lang string) (label.Label, bool) {
+				if imp.Lang == "scala" && imp.Imp == "foo.bar.baz.mapper" {
+					return label.New("", "proto", "foo_proto_scala_library"), true
+				}
+				return label.NoLabel, false
+			},
+			byImportFn: func(c *config.Config, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+				return nil
+			},
+			unresolvedDeps: map[string]error{
+				"foo.bar.baz.mapper": protoc.ErrNoLabel,
+			},
+			wantUnresolvedDeps: map[string]error{},
+			wantDeps:           nil,
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			c := &config.Config{}
+			r := rule.NewRule("proto_scala_library", "bar_proto_scala_library")
+
+			gotUnresolvedDeps := make(map[string]error)
+			for k, v := range tc.unresolvedDeps {
+				gotUnresolvedDeps[k] = v
+			}
+			resolveScalaDeps(tc.overrideFn, tc.byImportFn, c, r, gotUnresolvedDeps, tc.from)
+
+			gotDeps := r.AttrStrings("deps")
+
+			if diff := cmp.Diff(tc.wantDeps, gotDeps); diff != "" {
+				t.Errorf("deps (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tc.wantUnresolvedDeps, gotUnresolvedDeps); diff != "" {
+				t.Errorf("unresolved deps (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+type fakeCrossResolver struct {
+	result []resolve.FindResult
+}
+
+func (cr *fakeCrossResolver) CrossResolve(c *config.Config, ix *resolve.RuleIndex, imp resolve.ImportSpec, lang string) []resolve.FindResult {
+	return cr.result
 }

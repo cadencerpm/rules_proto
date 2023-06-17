@@ -7,6 +7,8 @@ workspace(name = "build_stack_rules_proto")
 # ----------------------------------------------------
 
 register_toolchains("//toolchain:standard")
+# alternatively:
+# register_toolchains("//toolchain:prebuilt")
 
 # ----------------------------------------------------
 # Top-Level Dependency Trees
@@ -128,6 +130,7 @@ load(
 maven_install(
     artifacts = IO_GRPC_GRPC_JAVA_ARTIFACTS,
     generate_compat_repositories = True,
+    maven_install_json = "//:maven_install.json",
     override_targets = IO_GRPC_GRPC_JAVA_OVERRIDE_TARGETS,
     repositories = [
         "https://repo.maven.apache.org/maven2/",
@@ -255,3 +258,11 @@ node_repositories(
 )
 
 register_toolchains("//toolchain:nodejs")
+
+# ----------------------------------------------------
+# proto_repositories
+# ----------------------------------------------------
+
+load("//:proto_repositories.bzl", "proto_repositories")
+
+proto_repositories()

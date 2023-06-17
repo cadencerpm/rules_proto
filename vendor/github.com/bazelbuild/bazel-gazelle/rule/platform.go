@@ -64,9 +64,7 @@ var KnownPlatforms = []Platform{
 	{"freebsd", "arm"},
 	{"freebsd", "arm64"},
 	{"illumos", "amd64"},
-	{"ios", "386"},
 	{"ios", "amd64"},
-	{"ios", "arm"},
 	{"ios", "arm64"},
 	{"js", "wasm"},
 	{"linux", "386"},
@@ -96,11 +94,29 @@ var KnownPlatforms = []Platform{
 	{"windows", "386"},
 	{"windows", "amd64"},
 	{"windows", "arm"},
+	{"windows", "arm64"},
 }
 
 var OSAliases = map[string][]string{
-	"android": []string{"linux"},
-	"ios":     []string{"darwin"},
+	"android": {"linux"},
+	"ios":     {"darwin"},
+}
+
+// UnixOS is the set of GOOS values matched by the "unix" build tag.
+// This list is from go/src/cmd/dist/build.go.
+var UnixOS = map[string]bool{
+	"aix":       true,
+	"android":   true,
+	"darwin":    true,
+	"dragonfly": true,
+	"freebsd":   true,
+	"hurd":      true,
+	"illumos":   true,
+	"ios":       true,
+	"linux":     true,
+	"netbsd":    true,
+	"openbsd":   true,
+	"solaris":   true,
 }
 
 var (

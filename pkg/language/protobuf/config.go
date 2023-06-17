@@ -29,9 +29,9 @@ func (pl *protobufLang) RegisterFlags(fs *flag.FlagSet, cmd string, c *config.Co
 	fs.StringVar(&pl.repoName,
 		"proto_repo_name", "",
 		"external name of this repository")
-	fs.BoolVar(&pl.overrideGoGooleapis,
-		"override_go_googleapis", false,
-		"if true, remove hardcoded proto_library deps on go_googleapis")
+	fs.BoolVar(&pl.reresolveKnownProtoImports,
+		"reresolve_known_proto_imports", false,
+		"if true, re-resolve hardcoded proto_library deps on go_googleapis and com_google_protobuf from language/proto from the index")
 	fs.Var(&pl.starlarkRules,
 		"proto_rule",
 		"register custom starlark rule of the form `<file_name>%<rule_name>`")
@@ -46,6 +46,18 @@ func (pl *protobufLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
 	cfg := protoc.NewPackageConfig(c)
 	c.Exts[pl.name] = cfg
 
+	for _, starlarkPlugin := range pl.starlarkPlugins {
+		if err := protoc.RegisterStarlarkPlugin(c, starlarkPlugin); err != nil {
+			return err
+		}
+	}
+
+	for _, starlarkRule := range pl.starlarkRules {
+		if err := protoc.RegisterStarlarkRule(c, starlarkRule); err != nil {
+			return err
+		}
+	}
+
 	if pl.configFiles != "" {
 		for _, filename := range strings.Split(pl.configFiles, ",") {
 			if err := protoc.LoadYConfigFile(c, cfg, filename); err != nil {
@@ -59,18 +71,6 @@ func (pl *protobufLang) CheckFlags(fs *flag.FlagSet, c *config.Config) error {
 			if err := protoc.GlobalResolver().LoadFile(filename); err != nil {
 				return fmt.Errorf("loading %s: %w", filename, err)
 			}
-		}
-	}
-
-	for _, starlarkPlugin := range pl.starlarkPlugins {
-		if err := registerStarlarkPlugin(c, starlarkPlugin); err != nil {
-			return err
-		}
-	}
-
-	for _, starlarkRule := range pl.starlarkRules {
-		if err := registerStarlarkRule(c, starlarkRule); err != nil {
-			return err
 		}
 	}
 
@@ -126,52 +126,6 @@ func (pl *protobufLang) getOrCreatePackageConfig(config *config.Config) *protoc.
 	}
 	config.Exts[pl.name] = cfg
 	return cfg
-}
-
-func registerStarlarkPlugin(c *config.Config, starlarkPlugin string) error {
-	parts := strings.Split(starlarkPlugin, "%")
-	if len(parts) != 2 {
-		return fmt.Errorf("invalid starlark plugin name %q", starlarkPlugin)
-	}
-	fileName := parts[0]
-	ruleName := parts[1]
-	var configureError error
-	impl, err := protoc.LoadStarlarkPluginFromFile(c.WorkDir, fileName, ruleName, func(msg string) {
-	}, func(err error) {
-		configureError = err
-	})
-	if err != nil {
-		return err
-	}
-	if configureError != nil {
-		return configureError
-	}
-	configureError = err
-	protoc.Plugins().RegisterPlugin(starlarkPlugin, impl)
-	return nil
-}
-
-func registerStarlarkRule(c *config.Config, starlarkRule string) error {
-	parts := strings.Split(starlarkRule, "%")
-	if len(parts) != 2 {
-		return fmt.Errorf("invalid starlark rule name %q", starlarkRule)
-	}
-	fileName := parts[0]
-	ruleName := parts[1]
-	var configureError error
-	impl, err := protoc.LoadStarlarkLanguageRuleFromFile(c.WorkDir, fileName, ruleName, func(msg string) {
-	}, func(err error) {
-		configureError = err
-	})
-	if err != nil {
-		return err
-	}
-	if configureError != nil {
-		return configureError
-	}
-	configureError = err
-	protoc.Rules().MustRegisterRule(starlarkRule, impl)
-	return nil
 }
 
 func registerWellKnownProtos(resolver protoc.ImportResolver) {

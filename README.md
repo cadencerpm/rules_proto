@@ -30,25 +30,31 @@ Bazel starlark rules for building protocol buffers +/- gRPC :sparkles:.
 
 # Table of Contents
 
+- [`rules_proto (v2)`](#rules_proto-v2)
+- [Table of Contents](#table-of-contents)
 - [Getting Started](#getting-started)
-  - [Workspace Boilerplate](#workspace-boilerplate)
+  - [`WORKSPACE` Boilerplate](#workspace-boilerplate)
   - [Gazelle Setup](#gazelle-setup)
   - [Gazelle Configuration](#gazelle-configuration)
     - [Build Directives](#build-directives)
-    - [YAML Config File](#yaml-configuration)
+    - [YAML Configuration](#yaml-configuration)
   - [Running Gazelle](#running-gazelle)
-- [Build Rules](#build-rules)
-  - [proto_compile](#proto_compile)
-  - [proto_plugin](#proto_plugin)
-  - [proto_compiled_sources](#proto_compiled_sources)
-  - [Deep dive on the mappings attribute](#the-output_mappings-attribute)
-- [Repository Rules](#repository-rules)
-  - [proto_repository](#proto_repository)
-  - [proto_gazelle](#proto_gazelle)
-- [Plugin Implementations](#plugin-implementations)
-- [Rule Implementations](#rule-implementations)
-- [Writing Custom Plugins & Rules](#writing-custom-plugins-and-rules)
-- [History of this repository](#history)
+  - [Build Rules](#build-rules)
+    - [proto\_compile](#proto_compile)
+    - [proto\_plugin](#proto_plugin)
+    - [proto\_compiled\_sources](#proto_compiled_sources)
+    - [proto\_compile\_assets](#proto_compile_assets)
+    - [The `output_mappings` attribute](#the-output_mappings-attribute)
+  - [Repository Rules](#repository-rules)
+  - [proto\_repository](#proto_repository)
+  - [proto\_gazelle](#proto_gazelle)
+  - [golden\_filegroup](#golden_filegroup)
+  - [Plugin Implementations](#plugin-implementations)
+  - [Rule Implementations](#rule-implementations)
+- [Writing Custom Plugins and Rules](#writing-custom-plugins-and-rules)
+  - [+/- of golang implementations](#--of-golang-implementations)
+  - [+/- of starlark implementations](#--of-starlark-implementations)
+- [History](#history)
 
 # Getting Started
 
@@ -57,18 +63,16 @@ Bazel starlark rules for building protocol buffers +/- gRPC :sparkles:.
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-# Branch: master
-# Commit: 7c95feba87ae269d09690fcebb18c77d8b8bcf6a
-# Date: 2021-11-16 02:17:58 +0000 UTC
-# URL: https://github.com/stackb/rules_proto/commit/7c95feba87ae269d09690fcebb18c77d8b8bcf6a
-#
-# V2 (#193)
-# Size: 885598 (886 kB)
+# Release: v2.0.1
+# TargetCommitish: master
+# Date: 2022-10-20 02:38:27 +0000 UTC
+# URL: https://github.com/stackb/rules_proto/releases/tag/v2.0.1
+# Size: 2071295 (2.1 MB)
 http_archive(
     name = "build_stack_rules_proto",
-    sha256 = "1190c296a9f931343f70e58e5f6f9ee2331709be4e17001bb570e41237a6c497",
-    strip_prefix = "rules_proto-7c95feba87ae269d09690fcebb18c77d8b8bcf6a",
-    urls = ["https://github.com/stackb/rules_proto/archive/7c95feba87ae269d09690fcebb18c77d8b8bcf6a.tar.gz"],
+    sha256 = "ac7e2966a78660e83e1ba84a06db6eda9a7659a841b6a7fd93028cd8757afbfb",
+    strip_prefix = "rules_proto-2.0.1",
+    urls = ["https://github.com/stackb/rules_proto/archive/v2.0.1.tar.gz"],
 )
 ```
 
@@ -112,7 +116,7 @@ load(
 
 go_rules_dependencies()
 
-go_register_toolchains(version = "1.16.2")
+go_register_toolchains(version = "1.18.2")
 ```
 
 > Standard biolerplate for `@io_bazel_rules_go`.
@@ -592,7 +596,7 @@ proto_repository(
     ],
     build_file_generation = "clean",
     build_file_proto_mode = "file",
-    override_go_googleapis = True,
+    reresolve_known_proto_imports = True,
     proto_language_config_file = "//example:config.yaml",
     strip_prefix = "googleapis-02710fa0ea5312d79d7fb986c9c9823fb41049a9",
     type = "zip",
@@ -617,7 +621,7 @@ Takeaways:
   external workspace.
 - `proto_language_config_file` is an optional label pointing to a valid
   `config.yaml` file to configure this extension.
-- `override_go_googleapis` is a boolean attribute that has special meaning for
+- `reresolve_known_proto_imports` is a boolean attribute that has special meaning for
   the googleapis repository. Due to the fact that the builtin gazelle "proto"
   extension has
   [hardcoded logic](https://github.com/bazelbuild/bazel-gazelle/blob/master/language/proto/known_proto_imports.go)
@@ -763,45 +767,43 @@ golden_filegroup(
 The plugin name is an opaque string, but by convention they are maven-esqe
 artifact identifiers that follow a GitHub org/repo/plugin_name convention.
 
-| Plugin                                                                                                                            |
-|-----------------------------------------------------------------------------------------------------------------------------------|
-| [builtin:cpp](pkg/plugin/builtin/cpp_plugin.go)                                                                                   |
-| [builtin:csharp](pkg/plugin/builtin/csharp_plugin.go)                                                                             |
-| [builtin:java](pkg/plugin/builtin/java_plugin.go)                                                                                 |
-| [builtin:js:closure](pkg/plugin/builtin/js_closure_plugin.go)                                                                     |
-| [builtin:js:common](pkg/plugin/builtin/js_common_plugin.go)                                                                       |
-| [builtin:objc](pkg/plugin/builtin/objc_plugin.go)                                                                                 |
-| [builtin:php](pkg/plugin/builtin/php_plugin.go)                                                                                   |
-| [builtin:python](pkg/plugin/builtin/python_plugin.go)                                                                             |
-| [builtin:pyi](pkg/plugin/builtin/pyi_plugin.go)                                                                                   |
-| [builtin:ruby](pkg/plugin/builtin/ruby_plugin.go)                                                                                 |
-| [grpc:grpc:cpp](pkg/plugin/builtin/grpc_grpc_cpp.go)                                                                              |
-| [grpc:grpc:protoc-gen-grpc-python](pkg/plugin/grpc/grpc/protoc-gen-grpc-python.go)                                                |
-| [golang:protobuf:protoc-gen-go](pkg/plugin/golang/protobuf/protoc-gen-go.go)                                                      |
-| [grpc:grpc-go:protoc-gen-go-grpc](pkg/plugin/grpc/grpcgo/protoc-gen-go-grpc.go)                                                   |
-| [grpc:grpc-java:protoc-gen-grpc-java](pkg/plugin/grpc/grpcjava/protoc-gen-grpc-java.go)                                           |
-| [grpc:grpc-node:protoc-gen-grpc-node](pkg/plugin/grpc/grpcnode/protoc-gen-grpc-node.go)                                           |
-| [grpc:grpc-web:protoc-gen-grpc-web](pkg/plugin/grpc/grpcweb/protoc-gen-grpc-web.go)                                               |
-| [gogo:protobuf:protoc-gen-combo](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                     |
-| [gogo:protobuf:protoc-gen-gogo](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                      |
-| [gogo:protobuf:protoc-gen-gogofast](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                  |
-| [gogo:protobuf:protoc-gen-gogofaster](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                |
-| [gogo:protobuf:protoc-gen-gogoslick](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                 |
-| [gogo:protobuf:protoc-gen-gogotypes](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                 |
-| [gogo:protobuf:protoc-gen-gostring](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                                  |
-| [grpc-ecosystem:grpc-gateway:protoc-gen-grpc-gateway](pkg/plugin/grpcecosystem/grpcgateway/protoc-gen-grpc-gateway.go)            |
-| [grpc-ecosystem:grpc-gateway:protoc-gen-grpc-openapiv2](pkg/plugin/grpcecosystem/grpcgateway/protoc-gen-grpc-openapiv2.go)        |
-| [grpc-ecosystem:grpc-gateway-ts:protoc-gen-grpc-gateway-ts](pkg/plugin/grpcecosystem/grpcgatewayts/protoc-gen-grpc-gateway-ts.go) |
-| [scalapb:scalapb:protoc-gen-scala](pkg/plugin/scalapb/scalapb/protoc_gen_scala.go)                                                |
-| [stackb:grpc.js:protoc-gen-grpc-js](pkg/plugin/stackb/grpc_js/protoc-gen-grpc-js.go)                                              |
-| [stephenh:ts-proto:protoc-gen-ts-proto](pkg/plugin/stephenh/ts-proto/protoc-gen-ts-proto.go)
+| Plugin                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------- |
+| [builtin:cpp](pkg/plugin/builtin/cpp_plugin.go)                                                                        |
+| [builtin:csharp](pkg/plugin/builtin/csharp_plugin.go)                                                                  |
+| [builtin:java](pkg/plugin/builtin/java_plugin.go)                                                                      |
+| [builtin:js:closure](pkg/plugin/builtin/js_closure_plugin.go)                                                          |
+| [builtin:js:common](pkg/plugin/builtin/js_common_plugin.go)                                                            |
+| [builtin:objc](pkg/plugin/builtin/objc_plugin.go)                                                                      |
+| [builtin:php](pkg/plugin/builtin/php_plugin.go)                                                                        |
+| [builtin:python](pkg/plugin/builtin/python_plugin.go)                                                                  |
+| [builtin:pyi](pkg/plugin/builtin/pyi_plugin.go)                                                                        |
+| [builtin:ruby](pkg/plugin/builtin/ruby_plugin.go)                                                                      |
+| [grpc:grpc:cpp](pkg/plugin/builtin/grpc_grpc_cpp.go)                                                                   |
+| [grpc:grpc:protoc-gen-grpc-python](pkg/plugin/grpc/grpc/protoc-gen-grpc-python.go)                                     |
+| [golang:protobuf:protoc-gen-go](pkg/plugin/golang/protobuf/protoc-gen-go.go)                                           |
+| [grpc:grpc-go:protoc-gen-go-grpc](pkg/plugin/grpc/grpcgo/protoc-gen-go-grpc.go)                                        |
+| [grpc:grpc-java:protoc-gen-grpc-java](pkg/plugin/grpc/grpcjava/protoc-gen-grpc-java.go)                                |
+| [grpc:grpc-node:protoc-gen-grpc-node](pkg/plugin/grpc/grpcnode/protoc-gen-grpc-node.go)                                |
+| [grpc:grpc-web:protoc-gen-grpc-web](pkg/plugin/grpc/grpcweb/protoc-gen-grpc-web.go)                                    |
+| [gogo:protobuf:protoc-gen-combo](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                          |
+| [gogo:protobuf:protoc-gen-gogo](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                           |
+| [gogo:protobuf:protoc-gen-gogofast](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                       |
+| [gogo:protobuf:protoc-gen-gogofaster](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                     |
+| [gogo:protobuf:protoc-gen-gogoslick](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                      |
+| [gogo:protobuf:protoc-gen-gogotypes](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                      |
+| [gogo:protobuf:protoc-gen-gostring](pkg/plugin/gogo/protobuf/protoc-gen-gogo.go)                                       |
+| [grpc-ecosystem:grpc-gateway:protoc-gen-grpc-gateway](pkg/plugin/grpcecosystem/grpcgateway/protoc-gen-grpc-gateway.go) |
+| [scalapb:scalapb:protoc-gen-scala](pkg/plugin/scalapb/scalapb/protoc_gen_scala.go)                                     |
+| [stackb:grpc.js:protoc-gen-grpc-js](pkg/plugin/stackb/grpc_js/protoc-gen-grpc-js.go)                                   |
+| [stephenh:ts-proto:protoc-gen-ts-proto](pkg/plugin/stephenh/ts-proto/protoc-gen-ts-proto.go)                           |
 
 ## Rule Implementations
 
 The rule name is an opaque string, but by convention they are maven-esqe
 artifact identifiers that follow a GitHub org/repo/rule_name convention.
 
-| Rule                                                                                              |
+| Plugin                                                                                            |
 | ------------------------------------------------------------------------------------------------- |
 | [stackb:rules_proto:grpc_cc_library](pkg/rule/rules_cc/grpc_cc_library.go)                        |
 | [stackb:rules_proto:grpc_closure_js_library](pkg/rule/rules_closure/grpc_closure_js_library.go)   |
@@ -818,7 +820,6 @@ artifact identifiers that follow a GitHub org/repo/rule_name convention.
 | [stackb:rules_proto:proto_java_library](pkg/rule/rules_java/proto_java_library.go)                |
 | [stackb:rules_proto:proto_nodejs_library](pkg/rule/rules_nodejs/proto_nodejs_library.go)          |
 | [stackb:rules_proto:proto_py_library](pkg/rule/rules_python/proto_py_library.go)                  |
-| [stackb:rules_proto:proto_ts_library](pkg/rule/rules_nodejs/proto_ts_library.go)                  |
 | [bazelbuild:rules_scala:scala_proto_library](pkg/rule/rules_scala/scala_proto_library.go)         |
 
 Please consult the `example/` directory and unit tests for more additional

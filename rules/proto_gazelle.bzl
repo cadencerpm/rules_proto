@@ -26,10 +26,6 @@ DEFAULT_LANGUAGES = [
     "@build_stack_rules_proto//language/protobuf",
 ]
 
-# Label instances stringify to a canonical label if and only if Bzlmod is
-# enabled.
-IS_BZLMOD_ENABLED = str(Label("//:bogus")).startswith("@@")
-
 def _valid_env_variable_name(name):
     """ Returns if a string is in the regex [a-zA-Z_][a-zA-Z0-9_]*
 
@@ -60,6 +56,7 @@ def _gazelle_runner_impl(ctx):
     if ctx.attr.imports:
         imports = ",".join([f.short_path for f in ctx.files.imports])
         args.extend(["-proto_imports_in", imports])
+
     args.extend([ctx.expand_location(arg, ctx.attr.data) for arg in ctx.attr.extra_args])
 
     for key in ctx.attr.env:
@@ -70,7 +67,6 @@ def _gazelle_runner_impl(ctx):
 
     out_file = ctx.actions.declare_file(ctx.label.name + ".bash")
     go_tool = ctx.toolchains["@io_bazel_rules_go//go:toolchain"].sdk.go
-    repo_config = ctx.file._repo_config
     substitutions = {
         "@@ARGS@@": shell.array_literal(args),
         "@@GAZELLE_LABEL@@": shell.quote(str(ctx.attr.gazelle.label)),
@@ -82,7 +78,7 @@ def _gazelle_runner_impl(ctx):
         "@@RUNNER_LABEL@@": shell.quote(str(ctx.label)),
         "@@GOTOOL@@": shell.quote(go_tool.path),
         "@@ENV@@": env,
-        "@@REPO_CONFIG_SHORT_PATH@@": shell.quote(repo_config.short_path) if repo_config else "",        
+        "@@REPO_CONFIG_SHORT_PATH@@": "",
     }
     ctx.actions.expand_template(
         template = ctx.file._template,
@@ -90,10 +86,16 @@ def _gazelle_runner_impl(ctx):
         substitutions = substitutions,
         is_executable = True,
     )
-    runfiles = ctx.runfiles(files = [
+
+    runfiles = ctx.runfiles(files = ctx.files.cfgs + ctx.files.imports + [
         ctx.executable.gazelle,
         go_tool,
-    ] + ctx.files.cfgs + ctx.files.imports + ctx.files.data)
+    ]).merge(
+        ctx.attr.gazelle[DefaultInfo].default_runfiles,
+    )
+    for d in ctx.attr.data:
+        runfiles = runfiles.merge(d[DefaultInfo].default_runfiles)
+
     return [DefaultInfo(
         files = depset([out_file]),
         runfiles = runfiles,
@@ -104,7 +106,7 @@ _gazelle_runner = rule(
     implementation = _gazelle_runner_impl,
     attrs = {
         "gazelle": attr.label(
-            default = "@bazel_gazelle//cmd/gazelle",
+            default = "@build_stack_rules_proto//cmd/gazelle",
             executable = True,
             cfg = "exec",
         ),
@@ -127,13 +129,9 @@ _gazelle_runner = rule(
         "prefix": attr.string(),
         "extra_args": attr.string_list(),
         "data": attr.label_list(allow_files = True),
-        "env": attr.string_dict(),
         "imports": attr.label_list(allow_files = True),
         "cfgs": attr.label_list(allow_files = True),
-        "_repo_config": attr.label(
-            default = "@bazel_gazelle_go_repository_config//:WORKSPACE" if IS_BZLMOD_ENABLED else None,
-            allow_single_file = True,
-        ),        
+        "env": attr.string_dict(),
         "_template": attr.label(
             default = "@bazel_gazelle//internal:gazelle.bash.in",
             allow_single_file = True,

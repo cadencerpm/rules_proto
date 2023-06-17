@@ -62,9 +62,17 @@ func New(repo, pkg, name string) Label {
 var NoLabel = Label{}
 
 var (
-	labelRepoRegexp = regexp.MustCompile(`^$|^[A-Za-z][A-Za-z0-9_]*$`)
-	labelPkgRegexp  = regexp.MustCompile(`^[A-Za-z0-9/._-]*$`)
-	labelNameRegexp = regexp.MustCompile(`^[A-Za-z0-9_/.+=,@~-]*$`)
+	// This was taken from https://github.com/bazelbuild/bazel/blob/71fb1e4188b01e582a308cfe4bcbf1c730eded1b/src/main/java/com/google/devtools/build/lib/cmdline/RepositoryName.java#L159C1-L164
+	labelRepoRegexp = regexp.MustCompile(`^@$|^[A-Za-z0-9_.-][A-Za-z0-9_.~-]*$`)
+	// This was taken from https://github.com/bazelbuild/bazel/blob/master/src/main/java/com/google/devtools/build/lib/cmdline/LabelValidator.java
+	// Package names may contain all 7-bit ASCII characters except:
+	// 0-31 (control characters)
+	// 58 ':' (colon) - target name separator
+	// 92 '\' (backslash) - directory separator (on Windows); may be allowed in the future
+	// 127 (delete)
+	// Target names may contain the same characters
+	labelPkgRegexp  = regexp.MustCompile(`^[\x20-\x39\x3B-\x5B\x5D-\x7E]*$`)
+	labelNameRegexp = labelPkgRegexp
 )
 
 // Parse reads a label from a string.
@@ -77,9 +85,14 @@ func Parse(s string) (Label, error) {
 	if strings.HasPrefix(s, "@") {
 		relative = false
 		endRepo := strings.Index(s, "//")
-		if endRepo > 0 {
+		if endRepo > len("@") {
 			repo = s[len("@"):endRepo]
 			s = s[endRepo:]
+			// If the label begins with "@//...", set repo = "@"
+			// to remain distinct from "//...", where repo = ""
+		} else if endRepo == len("@") {
+			repo = s[:len("@")]
+			s = s[len("@"):]
 		} else {
 			repo = s[len("@"):]
 			s = "//:" + repo
@@ -134,8 +147,12 @@ func (l Label) String() string {
 	}
 
 	var repo string
-	if l.Repo != "" {
+	if l.Repo != "" && l.Repo != "@" {
 		repo = fmt.Sprintf("@%s", l.Repo)
+	} else {
+		// if l.Repo == "", the label string will begin with "//"
+		// if l.Repo == "@", the label string will begin with "@//"
+		repo = l.Repo
 	}
 
 	if path.Base(l.Pkg) == l.Name {

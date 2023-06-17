@@ -357,7 +357,11 @@ func updateStmt(oldStmt *[]bzl.Expr, inserts, deletes, stmts []*stmt) {
 	sort.Stable(byIndex(deletes))
 	sort.Stable(byIndex(inserts))
 	sort.Stable(byIndex(stmts))
-	newStmt := make([]bzl.Expr, 0, len(*oldStmt)-len(deletes)+len(inserts))
+	cap := len(*oldStmt) - len(deletes) + len(inserts)
+	if cap < 0 {
+		cap = 0
+	}
+	newStmt := make([]bzl.Expr, 0, cap)
 	var ii, di, si int
 	for i, stmt := range *oldStmt {
 		for ii < len(inserts) && inserts[ii].index == i {
@@ -390,23 +394,25 @@ func (f *File) Format() []byte {
 	return bzl.Format(f.File)
 }
 
-// SortMacro sorts rules in the macro of this File. It doesn't sort the rules if
+// SortMacro sorts rules and loads in the macro of this File. It doesn't sort the rules if
 // this File does not have a macro, e.g., WORKSPACE.
 // This method calls Sync internally.
 func (f *File) SortMacro() {
 	f.Sync()
-	if f.function != nil {
-		sort.Stable(byName{f.Rules, f.function.stmt.Body})
-	} else {
+
+	if f.function == nil {
 		panic(fmt.Sprintf("%s: not loaded as macro file", f.Path))
 	}
+
+	sort.Stable(loadsByName{f.Loads, f.File.Stmt})
+	sort.Stable(rulesByKindAndName{f.Rules, f.function.stmt.Body})
 }
 
 // Save writes the build file to disk. This method calls Sync internally.
 func (f *File) Save(path string) error {
 	f.Sync()
 	f.Content = bzl.Format(f.File)
-	return ioutil.WriteFile(path, f.Content, 0666)
+	return ioutil.WriteFile(path, f.Content, 0o666)
 }
 
 // HasDefaultVisibility returns whether the File contains a "package" rule with
@@ -490,26 +496,51 @@ func (s byIndex) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 
-type byName struct {
+type rulesByKindAndName struct {
 	rules []*Rule
 	exprs []bzl.Expr
 }
 
 // type checking
-var _ sort.Interface = byName{}
+var _ sort.Interface = rulesByKindAndName{}
 
-func (s byName) Len() int {
+func (s rulesByKindAndName) Len() int {
 	return len(s.rules)
 }
 
-func (s byName) Less(i, j int) bool {
-	return s.rules[i].Name() < s.rules[j].Name()
+func (s rulesByKindAndName) Less(i, j int) bool {
+	if s.rules[i].Kind() == s.rules[j].Kind() {
+		return s.rules[i].Name() < s.rules[j].Name()
+	}
+	return s.rules[i].Kind() < s.rules[j].Kind()
 }
 
-func (s byName) Swap(i, j int) {
+func (s rulesByKindAndName) Swap(i, j int) {
 	s.exprs[s.rules[i].index], s.exprs[s.rules[j].index] = s.exprs[s.rules[j].index], s.exprs[s.rules[i].index]
 	s.rules[i].index, s.rules[j].index = s.rules[j].index, s.rules[i].index
 	s.rules[i], s.rules[j] = s.rules[j], s.rules[i]
+}
+
+type loadsByName struct {
+	loads []*Load
+	exprs []bzl.Expr
+}
+
+// type checking
+var _ sort.Interface = loadsByName{}
+
+func (s loadsByName) Len() int {
+	return len(s.loads)
+}
+
+func (s loadsByName) Less(i, j int) bool {
+	return s.loads[i].Name() < s.loads[j].Name()
+}
+
+func (s loadsByName) Swap(i, j int) {
+	s.exprs[s.loads[i].index], s.exprs[s.loads[j].index] = s.exprs[s.loads[j].index], s.exprs[s.loads[i].index]
+	s.loads[i].index, s.loads[j].index = s.loads[j].index, s.loads[i].index
+	s.loads[i], s.loads[j] = s.loads[j], s.loads[i]
 }
 
 // identPair represents one symbol, with or without remapping, in a load
@@ -608,6 +639,19 @@ func (l *Load) Add(sym string) {
 	}
 }
 
+// AddAlias inserts a new aliased symbol into the load statement. This has
+// no effect if the symbol is already loaded. Symbols will be sorted, so the order
+// doesn't matter.
+func (l *Load) AddAlias(sym, to string) {
+	if _, ok := l.symbols[sym]; !ok {
+		l.symbols[sym] = identPair{
+			to:   &bzl.Ident{Name: to},
+			from: &bzl.Ident{Name: sym},
+		}
+		l.updated = true
+	}
+}
+
 // Remove deletes a symbol from the load statement. This has no effect if
 // the symbol is not loaded.
 func (l *Load) Remove(sym string) {
@@ -669,7 +713,7 @@ func (l *Load) sync() {
 // Rule represents a rule statement within a build file.
 type Rule struct {
 	stmt
-	kind    string
+	kind    bzl.Expr
 	args    []bzl.Expr
 	attrs   map[string]*bzl.AssignExpr
 	private map[string]interface{}
@@ -677,10 +721,11 @@ type Rule struct {
 
 // NewRule creates a new, empty rule with the given kind and name.
 func NewRule(kind, name string) *Rule {
-	call := &bzl.CallExpr{X: &bzl.Ident{Name: kind}}
+	kindIdent := &bzl.Ident{Name: kind}
+	call := &bzl.CallExpr{X: kindIdent}
 	r := &Rule{
 		stmt:    stmt{expr: call},
-		kind:    kind,
+		kind:    kindIdent,
 		attrs:   map[string]*bzl.AssignExpr{},
 		private: map[string]interface{}{},
 	}
@@ -696,16 +741,30 @@ func NewRule(kind, name string) *Rule {
 	return r
 }
 
+func isNestedDotOrIdent(expr bzl.Expr) bool {
+	if _, ok := expr.(*bzl.Ident); ok {
+		return true
+	}
+
+	dot, ok := expr.(*bzl.DotExpr)
+	if !ok {
+		return false
+	}
+
+	return isNestedDotOrIdent(dot.X)
+}
+
 func ruleFromExpr(index int, expr bzl.Expr) *Rule {
 	call, ok := expr.(*bzl.CallExpr)
 	if !ok {
 		return nil
 	}
-	x, ok := call.X.(*bzl.Ident)
-	if !ok {
+
+	kind := call.X
+	if !isNestedDotOrIdent(kind) {
 		return nil
 	}
-	kind := x.Name
+
 	var args []bzl.Expr
 	attrs := make(map[string]*bzl.AssignExpr)
 	for _, arg := range call.List {
@@ -738,12 +797,12 @@ func (r *Rule) ShouldKeep() bool {
 
 // Kind returns the kind of rule this is (for example, "go_library").
 func (r *Rule) Kind() string {
-	return r.kind
+	return bzl.FormatString(r.kind)
 }
 
 // SetKind changes the kind of rule this is.
 func (r *Rule) SetKind(kind string) {
-	r.kind = kind
+	r.kind = &bzl.Ident{Name: kind}
 	r.updated = true
 }
 
@@ -867,6 +926,11 @@ func (r *Rule) Args() []bzl.Expr {
 	return r.args
 }
 
+// AddArg adds a positional argument to the rule.
+func (r *Rule) AddArg(value bzl.Expr) {
+	r.args = append(r.args, value)
+}
+
 // Insert marks this statement for insertion at the end of the file. Multiple
 // statements will be inserted in the order Insert is called.
 func (r *Rule) Insert(f *File) {
@@ -917,7 +981,8 @@ func (r *Rule) sync() {
 	}
 
 	call := r.expr.(*bzl.CallExpr)
-	call.X.(*bzl.Ident).Name = r.kind
+	call.X = r.kind
+
 	if len(r.attrs) > 1 {
 		call.ForceMultiLine = true
 	}
@@ -947,7 +1012,7 @@ func (r *Rule) sync() {
 func ShouldKeep(e bzl.Expr) bool {
 	for _, c := range append(e.Comment().Before, e.Comment().Suffix...) {
 		text := strings.TrimSpace(strings.TrimPrefix(c.Token, "#"))
-		if text == "keep" {
+		if text == "keep" || strings.HasPrefix(text, "keep: ") {
 			return true
 		}
 	}

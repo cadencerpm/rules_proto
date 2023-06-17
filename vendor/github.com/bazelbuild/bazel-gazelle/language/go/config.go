@@ -36,9 +36,10 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/repo"
 	"github.com/bazelbuild/bazel-gazelle/rule"
 	bzl "github.com/bazelbuild/buildtools/build"
+	"golang.org/x/mod/modfile"
 )
 
-var minimumRulesGoVersion = version.Version{0, 20, 0}
+var minimumRulesGoVersion = version.Version{0, 29, 0}
 
 // goConfig contains configuration values related to Go rules.
 type goConfig struct {
@@ -199,8 +200,13 @@ type dependencyMode int
 
 const (
 	// externalMode indicates imports should be resolved to external dependencies
-	// (declared in WORKSPACE).
+	// (declared in WORKSPACE). Calls out to the network if an import can't be resolved
+	// locally.
 	externalMode dependencyMode = iota
+
+	// staticMode indicates imports should be resolved only to dependencies known by
+	// Gazelle (declared in WORKSPACE). Unknown imports are ignored.
+	staticMode
 
 	// vendorMode indicates imports should be resolved to libraries in the
 	// vendor directory.
@@ -208,11 +214,15 @@ const (
 )
 
 func (m dependencyMode) String() string {
-	if m == externalMode {
+	switch m {
+	case externalMode:
 		return "external"
-	} else {
-		return "vendored"
+	case staticMode:
+		return "static"
+	case vendorMode:
+		return "vendor"
 	}
+	return ""
 }
 
 type externalFlag struct {
@@ -223,6 +233,8 @@ func (f *externalFlag) Set(value string) error {
 	switch value {
 	case "external":
 		*f.depMode = externalMode
+	case "static":
+		*f.depMode = staticMode
 	case "vendored":
 		*f.depMode = vendorMode
 	default:
@@ -320,9 +332,11 @@ type moduleRepo struct {
 	repoName, modulePath string
 }
 
-var validBuildExternalAttr = []string{"external", "vendored"}
-var validBuildFileGenerationAttr = []string{"auto", "on", "off"}
-var validBuildFileProtoModeAttr = []string{"default", "legacy", "disable", "disable_global", "package"}
+var (
+	validBuildExternalAttr       = []string{"external", "vendored"}
+	validBuildFileGenerationAttr = []string{"auto", "on", "off"}
+	validBuildFileProtoModeAttr  = []string{"default", "legacy", "disable", "disable_global", "package"}
+)
 
 func (*goLang) KnownDirectives() []string {
 	return []string{
@@ -518,7 +532,9 @@ Update io_bazel_rules_go to a newer version in your WORKSPACE file.`
 					continue
 				}
 				gc.preprocessTags()
-				gc.setBuildTags(d.Value)
+				if err := gc.setBuildTags(d.Value); err != nil {
+					log.Print(err)
+				}
 
 			case "go_generate_proto":
 				if goGenerateProto, err := strconv.ParseBool(d.Value); err == nil {
@@ -591,6 +607,22 @@ Update io_bazel_rules_go to a newer version in your WORKSPACE file.`
 					if prefix := r.AttrString("prefix"); prefix != "" {
 						setPrefix(prefix)
 					}
+				}
+			}
+		}
+		if !gc.prefixSet {
+			// Parse the module directive out of the go.mod file, if present.
+			goModPath := filepath.Join(c.RepoRoot, filepath.FromSlash(rel), "go.mod")
+			goMod, err := os.ReadFile(goModPath)
+			// Reading the go.mod file is best-effort and may fail for various reasons, such as
+			// the file not existing or being a directory. Do not report errors.
+			if err == nil {
+				goModFile, err := modfile.ParseLax(goModPath, goMod, nil)
+				// If the go.mod file exists but is malformed, report the error.
+				if err != nil {
+					log.Printf("parsing %s: %s", goModPath, err)
+				} else {
+					setPrefix(goModFile.Module.Mod.Path)
 				}
 			}
 		}
