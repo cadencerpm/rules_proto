@@ -55,9 +55,3 @@ grpc_gateway_deps()
 load("@build_stack_rules_proto//deps:grpc_gateway_openapiv2_deps.bzl", "grpc_gateway_openapiv2_deps")
 
 grpc_gateway_openapiv2_deps()
-
-# == protoc-gen-validate == #
-
-load("@build_stack_rules_proto//deps:protoc_gen_validate_deps.bzl", "protoc_gen_validate_deps")
-
-protoc_gen_validate_deps()

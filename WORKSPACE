@@ -164,30 +164,6 @@ load("//deps:grpc_gateway_openapiv2_deps.bzl", "grpc_gateway_openapiv2_deps")
 grpc_gateway_openapiv2_deps()
 
 # ----------------------------------------------------
-# protoc-gen-validate
-# ----------------------------------------------------
-
-load("//deps:protoc_gen_validate_deps.bzl", "protoc_gen_validate_deps")
-
-protoc_gen_validate_deps()
-
-# ----------------------------------------------------
-# protoc-gen-docs
-# ----------------------------------------------------
-
-load("//deps:protoc_gen_doc_deps.bzl", "protoc_gen_doc_deps")
-
-protoc_gen_doc_deps()
-
-# ----------------------------------------------------
-# protoc-gen-go-aip
-# ----------------------------------------------------
-
-load("//deps:protoc_gen_go_aip_deps.bzl", "protoc_gen_go_aip_deps")
-
-protoc_gen_go_aip_deps()
-
-# ----------------------------------------------------
 # gRPC Gateway Typescript
 # ----------------------------------------------------
 

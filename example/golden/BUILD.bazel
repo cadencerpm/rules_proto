@@ -105,12 +105,6 @@ gazelle_testdata_example(
 )
 
 gazelle_testdata_example(
-    name = "protoc_gen_validate",
-    srcs = glob(["testdata/protoc_gen_validate/**/*"]),
-    workspace_template = "prebuilt.WORKSPACE",
-)
-
-gazelle_testdata_example(
     name = "grpc_gateway",
     srcs = glob(["testdata/grpc_gateway/**/*"]),
     workspace_template = "prebuilt.WORKSPACE",
