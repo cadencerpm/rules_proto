@@ -12,7 +12,6 @@ def go_core_deps():
     """go_core dependency macro
     """
     com_github_golang_protobuf()  # via <TOP>
-    com_github_grpc_ecosystem_grpc_gateway_v2()  # via <TOP>
     org_golang_google_grpc()  # via <TOP>
     org_golang_google_grpc_cmd_protoc_gen_go_grpc()  # via <TOP>
 
@@ -23,16 +22,6 @@ def com_github_golang_protobuf():
         sum = "h1:JjCZWpVbqXDqFVmTfYWEVTMIYrL/NPdPSCHPJ0T/raM=",
         version = "v1.4.3",
         importpath = "github.com/golang/protobuf",
-        build_file_proto_mode = "disable_global",
-    )
-
-def com_github_grpc_ecosystem_grpc_gateway_v2():
-    _maybe(
-        go_repository,
-        name = "com_github_grpc_ecosystem_grpc_gateway_v2",
-        sum = "h1:ESEyqQqXXFIcImj/BE8oKEX37Zsuceb2cZI+EL/zNCY=",
-        version = "v2.10.0",
-        importpath = "github.com/grpc-ecosystem/grpc-gateway/v2",
         build_file_proto_mode = "disable_global",
     )
 

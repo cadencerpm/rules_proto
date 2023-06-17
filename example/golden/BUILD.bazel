@@ -74,12 +74,6 @@ gazelle_testdata_example(
 )
 
 gazelle_testdata_example(
-    name = "go_grpc",
-    srcs = glob(["testdata/go_grpc/*"]),
-    workspace_template = "prebuilt.WORKSPACE",
-)
-
-gazelle_testdata_example(
     name = "gogo",
     srcs = glob(["testdata/gogo/*"]),
     workspace_template = "prebuilt.WORKSPACE",
@@ -102,18 +96,6 @@ gazelle_testdata_example(
     srcs = glob(["testdata/goembed/**/*"]),
     strip_prefix = "example/golden/testdata/goembed",
     workspace_template = "builtin.WORKSPACE",
-)
-
-gazelle_testdata_example(
-    name = "grpc_gateway",
-    srcs = glob(["testdata/grpc_gateway/**/*"]),
-    workspace_template = "prebuilt.WORKSPACE",
-)
-
-gazelle_testdata_example(
-    name = "grpc_openapiv2",
-    srcs = glob(["testdata/grpc_openapiv2/**/*"]),
-    workspace_template = "prebuilt.WORKSPACE",
 )
 
 gazelle_testdata_example(
