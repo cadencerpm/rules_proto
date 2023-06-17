@@ -17,7 +17,6 @@ go_library(
         "//pkg/plugin/grpc/grpcweb",
         "//pkg/plugin/grpcecosystem/grpcgateway",
         "//pkg/plugin/grpcecosystem/grpcgatewayts",
-        "//pkg/plugin/pseudomuto/protoc-gen-doc",
         "//pkg/plugin/scalapb/scalapb",
         "//pkg/plugin/stackb/grpc_js",
         "//pkg/plugin/stephenh/ts-proto",

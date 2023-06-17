@@ -12,7 +12,6 @@ filegroup(
         "//plugin/grpc/grpc-go:all_files",
         "//plugin/grpc/grpc-java:all_files",
         "//plugin/grpc/grpc-node:all_files",
-        "//plugin/pseudomuto/protoc-gen-doc:all_files",
         "//plugin/scalapb/scalapb:all_files",
         "//plugin/stackb/grpc_js:all_files",
         "//plugin/stephenh/ts-proto:all_files",
