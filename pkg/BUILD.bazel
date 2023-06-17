@@ -14,7 +14,6 @@ filegroup(
         "//pkg/plugin/grpcecosystem/grpcgateway:all_files",
         "//pkg/plugin/grpcecosystem/grpcgatewayts:all_files",
         "//pkg/plugin/pseudomuto/protoc-gen-doc:all_files",
-        "//pkg/plugin/einride/protoc-gen-go-aip:all_files",
         "//pkg/plugin/scalapb/scalapb:all_files",
         "//pkg/plugin/stackb/grpc_js:all_files",
         "//pkg/plugin/stephenh/ts-proto:all_files",

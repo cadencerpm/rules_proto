@@ -172,14 +172,6 @@ load("//deps:protoc_gen_doc_deps.bzl", "protoc_gen_doc_deps")
 protoc_gen_doc_deps()
 
 # ----------------------------------------------------
-# protoc-gen-go-aip
-# ----------------------------------------------------
-
-load("//deps:protoc_gen_go_aip_deps.bzl", "protoc_gen_go_aip_deps")
-
-protoc_gen_go_aip_deps()
-
-# ----------------------------------------------------
 # gRPC Gateway Typescript
 # ----------------------------------------------------
 

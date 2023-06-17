@@ -7,7 +7,6 @@ import (
 
 	_ "github.com/stackb/rules_proto/pkg/plugin/builtin"
 	_ "github.com/stackb/rules_proto/pkg/plugin/pseudomuto/protoc-gen-doc"
-	_ "github.com/stackb/rules_proto/pkg/plugin/einride/protoc-gen-go-aip"
 	_ "github.com/stackb/rules_proto/pkg/plugin/gogo/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/golang/protobuf"
 	_ "github.com/stackb/rules_proto/pkg/plugin/grpc/grpc"
