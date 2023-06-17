@@ -1,7 +1,6 @@
 package grpcnode
 
 import (
-	"fmt"
 	"path"
 	"strings"
 
@@ -30,7 +29,7 @@ func (p *ProtocGenGrpcWeb) Configure(ctx *protoc.PluginContext) *protoc.PluginCo
 	return &protoc.PluginConfiguration{
 		Label: label.New("build_stack_rules_proto", "plugin/grpc/grpc-web", "protoc-gen-grpc-web"),
 		Outputs: protoc.FlatMapFiles(
-			grpcGeneratedFileName(ctx.Rel, ctx.PluginConfig.GetOptions()),
+			grpcGeneratedFileName(ctx.Rel),
 			protoc.HasService,
 			ctx.ProtoLibrary.Files()...,
 		),
@@ -41,31 +40,12 @@ func (p *ProtocGenGrpcWeb) Configure(ctx *protoc.PluginContext) *protoc.PluginCo
 // grpcGeneratedFileName is a utility function that returns a function that
 // computes the name of a predicted generated file having the given extension(s)
 // relative to the given dir.
-func grpcGeneratedFileName(reldir string, options []string) func(f *protoc.File) []string {
-	isTypescript := false
-	for _, option := range options {
-		if option == "import_style=typescript" {
-			isTypescript = true
-		}
-	}
-
+func grpcGeneratedFileName(reldir string) func(f *protoc.File) []string {
 	return func(f *protoc.File) []string {
 		name := strings.ReplaceAll(f.Name, "-", "_")
 		if reldir != "" {
 			name = path.Join(reldir, name)
 		}
-
-		var filename string
-		if isTypescript {
-			segments := strings.Split(name, "/")
-			lastSegment := segments[len(segments)-1]
-			capitalized := strings.Title(lastSegment)
-			segments[len(segments)-1] = capitalized
-			filename = fmt.Sprintf("%sServiceClientPb.ts", strings.Join(segments, "/"))
-		} else {
-			filename = fmt.Sprintf("%s_grpc_web_pb.js", name)
-		}
-
-		return []string{filename}
+		return []string{name + "_grpc_web_pb.js"}
 	}
 }

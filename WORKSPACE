@@ -94,14 +94,6 @@ load("//:go_deps.bzl", "go_deps")
 go_deps()
 
 # ----------------------------------------------------
-# Third-party proto dependencies
-# ----------------------------------------------------
-
-load("//deps:proto_repositories.bzl", "proto_repositories")
-
-proto_repositories()
-
-# ----------------------------------------------------
 # Core gRPC
 # ----------------------------------------------------
 
@@ -153,26 +145,6 @@ grpc_java_repositories()
 load("//deps:go_core_deps.bzl", "go_core_deps")
 
 go_core_deps()
-
-# ----------------------------------------------------
-# gRPC Gateway
-# ----------------------------------------------------
-
-load("//deps:grpc_gateway_deps.bzl", "grpc_gateway_deps")
-
-grpc_gateway_deps()
-
-load("//deps:grpc_gateway_openapiv2_deps.bzl", "grpc_gateway_openapiv2_deps")
-
-grpc_gateway_openapiv2_deps()
-
-# ----------------------------------------------------
-# gRPC Gateway Typescript
-# ----------------------------------------------------
-
-load("//deps:grpc_gateway_ts_deps.bzl", "grpc_gateway_ts_deps")
-
-grpc_gateway_ts_deps()
 
 # ----------------------------------------------------
 # Scala
@@ -253,9 +225,7 @@ rules_closure_dependencies()
 
 load("@build_bazel_rules_nodejs//:index.bzl", "node_repositories")
 
-node_repositories(
-    node_version = "16.6.2",
-)
+node_repositories()
 
 register_toolchains("//toolchain:nodejs")
 

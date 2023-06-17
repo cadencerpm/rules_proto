@@ -20,40 +20,13 @@
 ## Go ##
 # gazelle:proto_plugin protoc-gen-go implementation golang:protobuf:protoc-gen-go
 # gazelle:proto_rule proto_go_library implementation stackb:rules_proto:proto_go_library
-# gazelle:proto_plugin protoc-gen-go dep @org_golang_google_protobuf//reflect/protoreflect
-# gazelle:proto_plugin protoc-gen-go dep @org_golang_google_protobuf//runtime/protoimpl
+# gazelle:proto_rule proto_go_library deps @org_golang_google_protobuf//reflect/protoreflect
+# gazelle:proto_rule proto_go_library deps @org_golang_google_protobuf//runtime/protoimpl
 # gazelle:proto_rule proto_go_library visibility //visibility:public
 # gazelle:proto_language go plugin protoc-gen-go
 # gazelle:proto_language go rule proto_compile
-# TODO: Investigate why build example/routeguide:routeguide_go_proto fails:
-# bazel-out/k8-fastbuild/bin/example/routeguide/routeguide_grpc.pb.go:15:11: undefined: grpc.SupportPackageIsVersion7
-# bazel-out/k8-fastbuild/bin/example/routeguide/routeguide_grpc.pb.go:177:33: undefined: grpc.ServiceRegistrar
-# gazelle:proto_language go rule proto_go_library
-
-## Go gRPC ##
-# gazelle:proto_plugin protoc-gen-go-grpc implementation grpc:grpc-go:protoc-gen-go-grpc
-# gazelle:proto_plugin protoc-gen-go-grpc dep @org_golang_google_grpc//:go_default_library
-# gazelle:proto_plugin protoc-gen-go-grpc dep @org_golang_google_grpc//codes
-# gazelle:proto_plugin protoc-gen-go-grpc dep @org_golang_google_grpc//status
-# gazelle:proto_language go plugin protoc-gen-go-grpc
-
-## gRPC Gateway ##
-# gazelle:proto_plugin protoc-gen-grpc-gateway implementation grpc-ecosystem:grpc-gateway:protoc-gen-grpc-gateway
-# gazelle:proto_plugin protoc-gen-grpc-gateway option logtostderr=true
-# gazelle:proto_plugin protoc-gen-grpc-gateway option generate_unbound_methods=true
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @org_golang_google_grpc//grpclog
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @org_golang_google_grpc//metadata
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @org_golang_google_protobuf//proto
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @com_github_grpc_ecosystem_grpc_gateway_v2//runtime
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @com_github_grpc_ecosystem_grpc_gateway_v2//utilities
-# gazelle:proto_plugin protoc-gen-grpc-gateway dep @com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-openapiv2/options
-# gazelle:proto_language go plugin protoc-gen-grpc-gateway
-
-## gRPC Gateway OpenAPIv2 ##
-# gazelle:proto_plugin protoc-gen-grpc-openapiv2 implementation grpc-ecosystem:grpc-gateway:protoc-gen-grpc-openapiv2
-# gazelle:proto_plugin protoc-gen-grpc-openapiv2 option logtostderr=true
-# gazelle:proto_plugin protoc-gen-grpc-openapiv2 option use_go_templates=true
-# gazelle:proto_language go plugin protoc-gen-grpc-openapiv2
+## Hold off on proto_go_library until we upgrade the deps of this repo
+## gazelle:proto_language go rule proto_go_library
 
 ## Java ##
 # gazelle:proto_plugin java implementation builtin:java
@@ -133,17 +106,10 @@
 # gazelle:proto_rule proto_ts_library attr args --lib ES2015
 # gazelle:proto_rule proto_ts_library deps @npm_tsc//protobufjs
 # gazelle:proto_rule proto_ts_library deps @npm_tsc//long
-# gazelle:proto_rule proto_ts_library resolve google/protobuf/([a-z]+).proto //google/protobuf:wkt_${1}_ts_proto
 
 # gazelle:proto_language ts_proto plugin ts_proto
 # gazelle:proto_language ts_proto rule proto_compile
 # gazelle:proto_language ts_proto rule proto_ts_library
-
-## gRPC Gateway Typescript ##
-# gazelle:proto_plugin protoc-gen-grpc-gateway-ts implementation grpc-ecosystem:grpc-gateway-ts:protoc-gen-grpc-gateway-ts
-# gazelle:proto_plugin protoc-gen-grpc-gateway-ts option fetch_module_directory=example
-# gazelle:proto_plugin protoc-gen-grpc-gateway-ts option fetch_module_filename=grpc-gateway-shared-fetch.pb.ts
-# gazelle:proto_language ts_proto plugin protoc-gen-grpc-gateway-ts
 
 ## closure + grpc.js ##
 # gazelle:proto_plugin closure_js implementation builtin:js:closure
@@ -178,5 +144,3 @@
 # gazelle:proto_language node_js rule proto_nodejs_library
 # gazelle:proto_language node_js rule grpc_nodejs_library
 # gazelle:proto_language node_js rule grpc_web_js_library
-
-exports_files(["config.yaml"])
